@@ -1,19 +1,33 @@
+import type { Metadata } from "next";
 import { accedi } from "./actions";
+
+export const metadata: Metadata = { title: "Accedi" };
 
 export default async function Login({ searchParams }: { searchParams: Promise<{ errore?: string }> }) {
   const { errore } = await searchParams;
   return (
-    <div className="mx-auto mt-24 max-w-sm rounded-xl border border-stone-200 bg-white p-8 shadow-sm">
-      <h1 className="text-xl font-semibold">Price<span className="text-amber-700">Guardian</span></h1>
-      <p className="mt-1 text-sm text-stone-500">Contabilità invisibile e controllo prezzi</p>
-      <form action={accedi} className="mt-6 space-y-4">
-        <input name="email" type="email" required placeholder="Email"
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-amber-700 focus:outline-none" />
-        <input name="password" type="password" required placeholder="Password"
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-amber-700 focus:outline-none" />
-        {errore && <p className="text-sm text-red-600">{errore}</p>}
-        <button className="w-full rounded-md bg-stone-900 py-2 text-sm font-medium text-white hover:bg-stone-800">Accedi</button>
-      </form>
+    <div className="relative grid min-h-dvh place-items-center overflow-hidden px-4">
+      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60 [background:radial-gradient(60%_50%_at_50%_0%,var(--ok-soft),transparent_70%)]" />
+      <div className="relative w-full max-w-[360px] animate-in">
+        <div className="mb-8 text-center">
+          <span className="mx-auto grid size-10 place-items-center rounded-xl bg-inverse text-base font-bold text-inverse-fg">P</span>
+          <h1 className="mt-5 text-xl font-semibold tracking-tight">Price Guardian</h1>
+          <p className="mt-1 text-[13px] text-muted">Contabilità invisibile e controllo prezzi</p>
+        </div>
+        <form action={accedi} className="card space-y-4 p-6 shadow-pop">
+          <div>
+            <label htmlFor="email" className="label">Email</label>
+            <input id="email" name="email" type="email" required autoComplete="email" autoFocus className="input h-9" />
+          </div>
+          <div>
+            <label htmlFor="password" className="label">Password</label>
+            <input id="password" name="password" type="password" required autoComplete="current-password" className="input h-9" />
+          </div>
+          {errore && <p role="alert" className="text-[13px] text-danger">{errore}</p>}
+          <button className="btn btn-primary h-9 w-full">Accedi</button>
+        </form>
+        <p className="mt-6 text-center text-[11px] text-subtle">Italia · Francia · Monaco · Svizzera</p>
+      </div>
     </div>
   );
 }

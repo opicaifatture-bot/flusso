@@ -1,70 +1,90 @@
-# Price Guardian — Invisible Accounting & Price Guardian
+# Price Guardian Enterprise
 
-MVP per ristoranti di lusso e clienti cross-border (Italia / Francia / Monaco / Svizzera).
+Contabilità invisibile e controllo prezzi per la ristorazione di lusso cross-border (Italia, Francia, Monaco, Svizzera).
 
 ```
-Fattura XML / PDF / foto DDT
-        │  POST (multipart o JSON base64)
-        ▼
-n8n "Price Guardian: acquisizione documenti"
-  1. Prepara richiesta Claude   (XML → testo, PDF → document, immagine → vision)
-  2. Archivia file originale    (Supabase Storage, bucket "documenti")
-  3. Estrai dati con Claude     (prompt cross-border, traduzione IT, EUR/CHF)
-  4. Valida e normalizza JSON   (numeri "1.234,56", unità di misura, date)
-  5. Salva e controlla prezzi   (RPC registra_documento: upsert + variazione %)
-  6. Risposta con anomalie
-        ▼
-Supabase (fornitori, documenti, articoli, storico_prezzi, v_anomalie)
-        ▼
-Web app Next.js (dashboard, badge anomalie, dettaglio, caricamento)
+Browser ──(1) prenota: ruolo, sede, impronta SHA-256──▶ Supabase (RPC crea_caricamento)
+   │──(2) upload diretto con URL firmato──────────────▶ Storage  documenti/{ristorante_id}/{documento_id}.ext
+   │──(3) server action: {documento_id} + token───────▶ n8n  → risponde 202 e lavora in background
+   ◀─(5) stato in tempo reale (Realtime, filtrato RLS)─ Supabase
+                                                         ▲
+n8n: scarica il file → Claude estrae → registra_documento → abbinamento al catalogo → completa_documento
 ```
-
-## Struttura
 
 | Cartella | Contenuto |
 |---|---|
-| `supabase/migrations/` | Schema, RLS, funzione `registra_documento`, bucket storage (già applicati al progetto `zbvmkrgxwwjritdarvzh`) |
-| `n8n/workflow.sdk.ts` | Sorgente del workflow n8n (già creato nell'istanza come bozza) |
-| `n8n/prompt.txt` | Prompt di Document Intelligence usato da Claude |
-| `web/` | Web app Next.js 15 + Tailwind 4 |
+| `supabase/migrations/` | Schema, RLS, audit, RPC (applicate al progetto `zbvmkrgxwwjritdarvzh`) |
+| `supabase/functions/embed/` | Edge Function: embedding `gte-small` (384 dimensioni) per alias e master |
+| `n8n/` | Prompt, codice dei nodi e definizione dei due workflow |
+| `web/` | Web app Next.js 15 + Tailwind 4 (deploy Vercel, Root Directory `web`) |
 
-## Logica anti-rincari
+## Modello dei dati
 
-La funzione `registra_documento(payload, p_file_url, p_soglia)` lavora in **una sola transazione**:
+- **Gruppo → ristoranti (sedi).** Catalogo master, alias e fornitori sono del gruppo; documenti, righe e prezzi sono della singola sede (`ristorante_id`).
+- **Ruoli** (`membri_ristorante`, `membri_gruppo`): titolare, chef, contabile, sola lettura. Il ruolo di sede prevale su quello di gruppo.
+- **Nessuna scrittura diretta dal client.** La RLS consente solo la lettura filtrata; ogni modifica passa da una RPC `security definer` che verifica il ruolo.
 
-- **Fornitore**: upsert per P.IVA/ID estero normalizzato (spazi e prefissi rimossi), con la ragione sociale come ripiego.
-- **Documento**: se lo stesso documento (fornitore, tipo, numero, data) arriva una seconda volta, viene sostituito e non duplicato.
-- **Articolo**: upsert per `(fornitore, codice articolo)`; se manca il codice, usa la descrizione italiana normalizzata.
-- **Storico prezzi**: confronta il prezzo con l'ultimo prezzo dello stesso articolo **nella stessa valuta**. Se la variazione supera `p_soglia` (default 5%), imposta `anomalia_prezzo = true`.
+| Azione | Titolare | Chef | Contabile | Sola lettura |
+|---|:-:|:-:|:-:|:-:|
+| Caricare documenti, correggere le righe, contestare un rincaro | ✓ | ✓ | ✓ | |
+| Correggere i dati di testata del documento | ✓ | | ✓ | |
+| Validare gli abbinamenti al catalogo | ✓ | ✓ | | |
+| Approvare rincari e nuovi articoli master, unire o revocare | ✓ | | | |
+| Impostazioni e team | ✓ | | | |
+| Consultare e verificare l'audit | ✓ | | ✓ | |
 
-## Configurazione
+## Audit trail
 
-### 1. n8n — credenziali da collegare
-Apri il workflow e completa:
+Ogni INSERT/UPDATE/DELETE sulle tabelle contabili scrive in `audit_log`: valori prima e dopo, utente, origine (app, n8n, sql), IP dichiarato dall'app e IP della connessione. Le righe sono concatenate con SHA-256, una catena per gruppo, serializzata con `pg_advisory_xact_lock`. UPDATE, DELETE e TRUNCATE sono bloccati da trigger e i privilegi di scrittura sono revocati a tutti i ruoli API.
 
-- **Ricevi documento** → credenziale *Header Auth* con nome header `X-Price-Guardian-Token` e un token lungo e casuale. (n8n ha assegnato in automatico la tua "Header Auth account" esistente: sostituiscila con una dedicata.)
-- **Archivia file originale** e **Salva e controlla prezzi** → nuova credenziale *Supabase API*: Host `https://zbvmkrgxwwjritdarvzh.supabase.co`, Service Role Key presa da Supabase → Project Settings → API keys.
-- **Estrai dati con Claude** → già collegato a "Anthropic account".
-
-Poi pubblica il workflow. Test:
-
-```bash
-curl -X POST "https://teamopicai.app.n8n.cloud/webhook/price-guardian/documento" -H "X-Price-Guardian-Token: <TOKEN>" -F "data=@fattura.pdf"
+```sql
+select * from verifica_audit();   -- sequenza, concatenazione e hash ricalcolato
 ```
 
-### 2. Utente per la web app
-Supabase → Authentication → Users → *Add user* (email + password). Le tabelle sono leggibili solo da utenti autenticati.
+Il primo di ogni mese il registro del mese precedente viene archiviato nel bucket `archivio-audit` insieme all'ultimo hash, che fa da ancora esterna. Nota: questo registro non sostituisce la conservazione a norma delle fatture elettroniche.
 
-### 3. Web app
+## Stati del documento
+
+`in_coda → elaborazione (estrazione → abbinamento) → completato`, oppure `errore` / `duplicato`.
+
+- **Idempotenza:** stesso file (SHA-256) nella stessa sede → non viene ricaricato. Stesso documento contabile (fornitore, tipo, numero, data) → marcato `duplicato`.
+- **Timeout:** `pg_cron` porta a `errore` i documenti fermi da più di 5 minuti; dall'app si può riprovare.
+
+## Catalogo master e abbinamento
+
+1. **Alias esatto** (fornitore + codice o descrizione): eredita il master già confermato, senza IA.
+2. **Somiglianza:** trigrammi (`pg_trgm`) più embedding (`pgvector`). Sopra 0,92 con distacco netto l'abbinamento è automatico.
+3. **Giudice (Claude)** solo sui casi incerti: confidenza ≥ 0,85 automatico, 0,50–0,85 proposta nella coda «Da validare», «nuovo» → master in bozza da approvare.
+
+Ogni conferma umana diventa un alias permanente. Le soglie sono in `gruppi`.
+
+**Prezzi confrontabili.** Ogni riga viene riportata all'unità base del master: conversione diretta (g→kg, cl→lt), peso reale della riga (tagli a peso variabile), fattore dell'alias («cartone 6×1 lt» → 6), contenuto letto dal documento. Il rincaro si calcola sul prezzo netto di sconto, rispetto all'acquisto cronologicamente precedente dallo stesso fornitore, nella valuta originale. Il controvalore in EUR usa l'ultimo tasso BCE disponibile alla data del documento (`tassi_cambio`).
+
+## n8n
+
+| Workflow | Funzione |
+|---|---|
+| `Price Guardian: acquisizione documenti` | Webhook `POST /webhook/price-guardian/documento` con `{documento_id}` e header `X-Price-Guardian-Token` |
+| `Price Guardian: manutenzione (tassi BCE e archivio audit)` | Ogni giorno alle 17:30: tassi BCE; il primo del mese: archivio audit |
+
+`n8n/codice/` e i due file di prompt sono la fonte del codice dei nodi; `workflow.operazioni.json` contiene le operazioni applicate al workflow principale, `manutenzione.sdk.ts` la definizione del secondo.
+
+## Web app
+
 ```bash
 cd web
-cp .env.example .env.local   # inserisci N8N_WEBHOOK_TOKEN
+cp .env.example .env.local
 npm install
 npm run dev
 ```
-Per il deploy su Vercel imposta le stesse variabili d'ambiente.
 
-## Limiti noti dell'MVP
-- Se un documento viene caricato in ritardo, la variazione è calcolata rispetto all'ultimo prezzo **registrato**, non a quello cronologicamente precedente.
-- Le FatturaPA firmate `.p7m` vanno estratte in XML prima dell'invio.
-- I prezzi in valute diverse non vengono confrontati tra loro (non c'è conversione di cambio).
+Variabili d'ambiente (anche su Vercel): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_HEADER`, `N8N_WEBHOOK_TOKEN` (solo server).
+
+Pagine: Panoramica, Documenti, dettaglio affiancato (originale + dati modificabili), Carica, Da validare, Rincari, Catalogo, Impostazioni (sede, team, audit). Tema scuro «Midnight Obsidian» predefinito, tema chiaro opzionale.
+
+## Limiti noti
+
+- Gli embedding usano `gte-small`, pensato soprattutto per l'inglese: servono ad ampliare la rosa dei candidati, la decisione spetta a trigrammi e giudice. Un modello multilingue richiede una chiave API esterna.
+- Le FatturaPA firmate `.p7m` vanno estratte in XML prima del caricamento.
+- I nuovi utenti si creano in Supabase → Authentication; poi si assegnano alla sede da Impostazioni → Team.
+- Una nuova sede o un nuovo gruppo si creano per ora da SQL.

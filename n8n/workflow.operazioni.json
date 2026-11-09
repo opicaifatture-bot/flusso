@@ -1,0 +1,746 @@
+{
+ "operations": [
+  {
+   "type": "removeNode",
+   "nodeName": "Archivia file originale"
+  },
+  {
+   "type": "removeNode",
+   "nodeName": "Sticky Note 2632a920"
+  },
+  {
+   "type": "removeConnection",
+   "source": "Ricevi documento",
+   "target": "Prepara richiesta Claude"
+  },
+  {
+   "type": "removeConnection",
+   "source": "Salva e controlla prezzi",
+   "target": "Rispondi con esito"
+  },
+  {
+   "type": "updateNodeParameters",
+   "nodeName": "Ricevi documento",
+   "replace": true,
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "price-guardian/documento",
+    "authentication": "headerAuth",
+    "responseMode": "responseNode",
+    "options": {}
+   }
+  },
+  {
+   "type": "updateNodeParameters",
+   "nodeName": "Rispondi con esito",
+   "replace": true,
+   "parameters": {
+    "respondWith": "json",
+    "responseBody": "={{ JSON.stringify({ ok: true, accettato: true, documento_id: $json.body.documento_id }) }}",
+    "options": {
+     "responseCode": 202
+    }
+   }
+  },
+  {
+   "type": "renameNode",
+   "oldName": "Rispondi con esito",
+   "newName": "Rispondi 202 Accepted"
+  },
+  {
+   "type": "setNodePosition",
+   "nodeName": "Rispondi 202 Accepted",
+   "position": [
+    220,
+    0
+   ]
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Avvia elaborazione",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     440,
+     0
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/rest/v1/rpc/avvia_elaborazione",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ p_documento_id: $('Ricevi documento').first().json.body.documento_id }) }}",
+     "options": {}
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Documento da elaborare?",
+    "type": "n8n-nodes-base.if",
+    "typeVersion": 2.2,
+    "position": [
+     660,
+     0
+    ],
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose"
+      },
+      "conditions": [
+       {
+        "id": "documento-da-elaborare",
+        "leftValue": "={{ $json.ok }}",
+        "operator": {
+         "type": "boolean",
+         "operation": "true",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Scarica file",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     880,
+     -100
+    ],
+    "parameters": {
+     "method": "GET",
+     "url": "=https://zbvmkrgxwwjritdarvzh.supabase.co/storage/v1/object/documenti/{{ $json.file_path }}",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "options": {
+      "response": {
+       "response": {
+        "responseFormat": "file",
+        "outputPropertyName": "data"
+       }
+      },
+      "timeout": 60000
+     }
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "updateNodeParameters",
+   "nodeName": "Prepara richiesta Claude",
+   "replace": true,
+   "parameters": {
+    "mode": "runOnceForAllItems",
+    "language": "javaScript",
+    "jsCode": "// Costruisce la richiesta di estrazione per Claude a partire dal file scaricato dallo storage.\nconst meta = $('Avvia elaborazione').first().json;\nconst buf = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst ext = String(meta.file_path || '').split('.').pop().toLowerCase();\nconst mime = meta.mime || 'application/pdf';\n\nlet blocco;\nif (ext === 'xml' || mime.includes('xml')) {\n  blocco = { type: 'text', text: 'Documento XML (FatturaPA o simile):\\n' + buf.toString('utf8').slice(0, 300000) };\n} else if (mime === 'application/pdf') {\n  blocco = { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: buf.toString('base64') } };\n} else if (mime.startsWith('image/')) {\n  blocco = { type: 'image', source: { type: 'base64', media_type: mime, data: buf.toString('base64') } };\n} else {\n  throw new Error('Formato non supportato: ' + mime);\n}\n\nconst SYSTEM = \"Sei un sistema di Document Intelligence di livello enterprise specializzato nella contabilità cross-border (Italia, Francia, Monaco, Svizzera) per la ristorazione di lusso. Estrai con precisione i dati da documenti commerciali multilingue (fatture, DDT, note di credito in italiano, francese, tedesco o inglese, anche FatturaPA XML).\\n\\nREGOLE RIGIDE\\n1. Restituisci ESCLUSIVAMENTE un oggetto JSON valido: nessun testo introduttivo, nessun commento, nessun blocco markdown.\\n2. Se un dato non è presente usa null. Non inventare e non dedurre valori che il documento non riporta.\\n3. Date nel formato YYYY-MM-DD. Numeri come numeri JSON con il punto decimale.\\n4. Valuta: codice ISO del documento (EUR, CHF, USD…). Non convertire gli importi.\\n5. Paese del fornitore: IT, FR, MC, CH o altro codice ISO. Per FR/MC inserisci SIRET/SIREN in codice_identificativo_estero.\\n6. Estrai TUTTE le righe con un prezzo, nell'ordine del documento, comprese spese di trasporto, cauzioni e imballi.\\n7. unita_misura è l'unità a cui si riferisce prezzo_unitario, normalizzata in: kg, g, lt, cl, ml, pz, conf, mt.\\n8. prezzo_unitario è il prezzo per unità di misura PRIMA degli sconti di riga; lo sconto va in sconto_percentuale. totale_riga è l'imponibile della riga.\\n9. descrizione_originale è il testo esatto del documento. descrizione_articolo è il nome in italiano, pulito e specifico: conserva taglio, razza, varietà, origine, denominazione (DOP/IGP/AOC), stagionatura, annata e formato della confezione; elimina codici interni, lotti e date di scadenza. Esempio: \\\"Filet de bœuf Charolais VBF\\\" → \\\"Filetto di manzo Charolais\\\".\\n10. peso_netto_kg: peso netto TOTALE della riga in kg, solo se il documento lo riporta e l'unità di vendita non è già il peso (esempio: 2 pz, peso 2,4 kg → 2.4). Altrimenti null.\\n11. contenuto_per_unita e unita_contenuto: quando l'articolo è venduto a pezzo o confezione e il documento ne indica il contenuto, riporta quanto contiene UNA unità di vendita, in kg, lt o pz. Esempi: \\\"cartone 6 × 1 L\\\" → 6 e \\\"lt\\\"; \\\"bottiglia 75 cl\\\" → 0.75 e \\\"lt\\\"; \\\"vaschetta 500 g\\\" → 0.5 e \\\"kg\\\"; \\\"cassa 12 pz\\\" → 12 e \\\"pz\\\". Altrimenti null.\\n\\nSTRUTTURA\\n{\\\"documento\\\":{\\\"tipo\\\":\\\"Fattura|DDT|Nota di Credito|Altro\\\",\\\"numero_documento\\\":null,\\\"data_documento\\\":null,\\\"codice_valuta\\\":\\\"EUR\\\"},\\n\\\"fornitore\\\":{\\\"ragione_sociale\\\":\\\"\\\",\\\"partita_iva_o_estera\\\":null,\\\"paese\\\":\\\"IT\\\",\\\"codice_identificativo_estero\\\":null},\\n\\\"cliente\\\":{\\\"ragione_sociale\\\":null,\\\"partita_iva\\\":null},\\n\\\"totali\\\":{\\\"imponibile\\\":0,\\\"iva\\\":0,\\\"totale_documento\\\":0,\\\"valuta\\\":\\\"EUR\\\"},\\n\\\"articoli\\\":[{\\\"codice_articolo_fornitore\\\":null,\\\"descrizione_originale\\\":\\\"\\\",\\\"descrizione_articolo\\\":\\\"\\\",\\\"quantita\\\":0,\\\"unita_misura\\\":\\\"kg\\\",\\\"prezzo_unitario\\\":0,\\\"sconto_percentuale\\\":null,\\\"totale_riga\\\":0,\\\"aliquota_iva_percentuale\\\":null,\\\"peso_netto_kg\\\":null,\\\"contenuto_per_unita\\\":null,\\\"unita_contenuto\\\":null}]}\";\n\nreturn [{ json: {\n  documento_id: meta.documento_id,\n  claudeRequest: {\n    model: 'claude-sonnet-5-5',\n    max_tokens: 16000,\n    system: SYSTEM,\n    messages: [{ role: 'user', content: [blocco, { type: 'text', text: 'Analizza il documento allegato ed estrai i dati seguendo rigorosamente la struttura. Solo JSON.' }] }]\n  }\n} }];\n"
+   }
+  },
+  {
+   "type": "setNodePosition",
+   "nodeName": "Prepara richiesta Claude",
+   "position": [
+    1100,
+    -100
+   ]
+  },
+  {
+   "type": "setNodePosition",
+   "nodeName": "Estrai dati con Claude",
+   "position": [
+    1320,
+    -100
+   ]
+  },
+  {
+   "type": "updateNodeParameters",
+   "nodeName": "Valida e normalizza JSON",
+   "replace": true,
+   "parameters": {
+    "mode": "runOnceForAllItems",
+    "language": "javaScript",
+    "jsCode": "// Valida la risposta di Claude e normalizza numeri, date e unità di misura.\nconst res = $input.first().json;\nif (res.stop_reason === 'max_tokens') throw new Error('Documento troppo lungo: dividilo in più file e riprova');\nconst text = (res.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();\nif (!text) throw new Error('Il modello non ha restituito dati');\nconst raw = text.replace(/^```(?:json)?\\s*/i, '').replace(/```\\s*$/, '');\nconst s = raw.indexOf('{'), e = raw.lastIndexOf('}');\nif (s < 0 || e < 0) throw new Error('Risposta del modello non interpretabile');\nlet data;\ntry { data = JSON.parse(raw.slice(s, e + 1)); } catch (err) { throw new Error('Risposta del modello non valida: ' + err.message); }\n\nconst num = v => {\n  if (v === null || v === undefined || v === '') return null;\n  if (typeof v === 'number') return Number.isFinite(v) ? v : null;\n  let t = String(v).replace(/[^0-9,.\\-]/g, '');\n  if (t.includes(',') && t.includes('.')) t = t.lastIndexOf(',') > t.lastIndexOf('.') ? t.replace(/\\./g, '').replace(',', '.') : t.replace(/,/g, '');\n  else if (t.includes(',')) t = t.replace(',', '.');\n  const n = parseFloat(t);\n  return Number.isFinite(n) ? n : null;\n};\nconst UM = { kg: 'kg', kilo: 'kg', kgs: 'kg', g: 'g', gr: 'g', grammi: 'g', lt: 'lt', l: 'lt', litre: 'lt', litro: 'lt', litri: 'lt', cl: 'cl', ml: 'ml', pz: 'pz', pc: 'pz', pce: 'pz', pcs: 'pz', u: 'pz', un: 'pz', unite: 'pz', 'unité': 'pz', nr: 'pz', st: 'pz', stk: 'pz', conf: 'conf', cf: 'conf', ct: 'conf', crt: 'conf', colis: 'conf', carton: 'conf', mt: 'mt', m: 'mt' };\nconst um = v => { const k = String(v || '').toLowerCase().replace(/\\./g, '').trim(); return UM[k] || (k || null); };\nconst date = v => (v && /^\\d{4}-\\d{2}-\\d{2}/.test(v)) ? String(v).slice(0, 10) : null;\n\nconst doc = data.documento || {};\ndoc.tipo = ['Fattura', 'DDT', 'Nota di Credito', 'Altro'].includes(doc.tipo) ? doc.tipo : 'Altro';\ndoc.data_documento = date(doc.data_documento);\ndoc.codice_valuta = String(doc.codice_valuta || (data.totali || {}).valuta || 'EUR').toUpperCase().slice(0, 3);\n\nconst forn = data.fornitore || {};\nif (!forn.ragione_sociale) throw new Error('Fornitore non riconosciuto nel documento');\nforn.paese = forn.paese ? String(forn.paese).toUpperCase().slice(0, 2) : null;\n\nconst tot = data.totali || {};\n['imponibile', 'iva', 'totale_documento'].forEach(k => { tot[k] = num(tot[k]); });\ntot.valuta = doc.codice_valuta;\n\nconst articoli = (data.articoli || []).map(a => {\n  const uc = um(a.unita_contenuto);\n  return {\n    codice_articolo_fornitore: a.codice_articolo_fornitore ? String(a.codice_articolo_fornitore).trim() : null,\n    descrizione_originale: a.descrizione_originale || a.descrizione_articolo || null,\n    descrizione_articolo: a.descrizione_articolo || a.descrizione_originale || null,\n    quantita: num(a.quantita),\n    unita_misura: um(a.unita_misura),\n    prezzo_unitario: num(a.prezzo_unitario),\n    sconto_percentuale: num(a.sconto_percentuale),\n    totale_riga: num(a.totale_riga),\n    aliquota_iva_percentuale: num(a.aliquota_iva_percentuale),\n    peso_netto_kg: num(a.peso_netto_kg),\n    contenuto_per_unita: num(a.contenuto_per_unita),\n    unita_contenuto: ['kg', 'g', 'lt', 'cl', 'ml', 'pz'].includes(uc) ? uc : null\n  };\n}).filter(a => a.descrizione_articolo && a.prezzo_unitario !== null);\n\nreturn [{ json: {\n  p_documento_id: $('Avvia elaborazione').first().json.documento_id,\n  payload: { documento: doc, fornitore: forn, cliente: data.cliente || {}, totali: tot, articoli }\n} }];\n"
+   }
+  },
+  {
+   "type": "setNodePosition",
+   "nodeName": "Valida e normalizza JSON",
+   "position": [
+    1540,
+    -100
+   ]
+  },
+  {
+   "type": "updateNodeParameters",
+   "nodeName": "Salva e controlla prezzi",
+   "replace": true,
+   "parameters": {
+    "method": "POST",
+    "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/rest/v1/rpc/registra_documento",
+    "authentication": "predefinedCredentialType",
+    "nodeCredentialType": "supabaseApi",
+    "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={{ JSON.stringify({ p_documento_id: $json.p_documento_id, payload: $json.payload }) }}",
+    "options": {}
+   }
+  },
+  {
+   "type": "renameNode",
+   "oldName": "Salva e controlla prezzi",
+   "newName": "Registra documento"
+  },
+  {
+   "type": "setNodePosition",
+   "nodeName": "Registra documento",
+   "position": [
+    1760,
+    -100
+   ]
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Nuovo documento?",
+    "type": "n8n-nodes-base.if",
+    "typeVersion": 2.2,
+    "position": [
+     1980,
+     -100
+    ],
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose"
+      },
+      "conditions": [
+       {
+        "id": "nuovo-documento",
+        "leftValue": "={{ $json.duplicato }}",
+        "operator": {
+         "type": "boolean",
+         "operation": "false",
+         "singleValue": true
+        }
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Calcola embedding",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     2200,
+     -200
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/functions/v1/embed",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "{}",
+     "options": {
+      "timeout": 90000
+     }
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Prepara abbinamento",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     2420,
+     -200
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/rest/v1/rpc/prepara_abbinamento",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ p_documento_id: $('Ricevi documento').first().json.body.documento_id }) }}",
+     "options": {}
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Casi incerti?",
+    "type": "n8n-nodes-base.if",
+    "typeVersion": 2.2,
+    "position": [
+     2640,
+     -200
+    ],
+    "parameters": {
+     "conditions": {
+      "options": {
+       "caseSensitive": true,
+       "leftValue": "",
+       "typeValidation": "loose"
+      },
+      "conditions": [
+       {
+        "id": "casi-incerti",
+        "leftValue": "={{ $json.n_incerti }}",
+        "operator": {
+         "type": "number",
+         "operation": "gt"
+        },
+        "rightValue": 0
+       }
+      ],
+      "combinator": "and"
+     },
+     "options": {}
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Prepara giudice",
+    "type": "n8n-nodes-base.code",
+    "typeVersion": 2,
+    "position": [
+     2860,
+     -320
+    ],
+    "parameters": {
+     "mode": "runOnceForAllItems",
+     "language": "javaScript",
+     "jsCode": "// Livello 3: prepara la richiesta al giudice (Claude) per i soli casi incerti.\nconst prep = $input.first().json;\nconst SYSTEM = \"Sei il responsabile acquisti di un gruppo di ristorazione di lusso (Italia, Francia, Monaco, Svizzera). Mantieni il CATALOGO MASTER: un elenco di articoli standard a cui vengono ricondotte le righe dei documenti dei fornitori, così che lo storico dei prezzi di uno stesso prodotto non si spezzi quando cambiano fornitore, lingua, codice o descrizione.\\n\\nRicevi alcune righe non ancora abbinate. Per ciascuna trovi i candidati del catalogo (con un punteggio di somiglianza testuale, puramente indicativo). Decidi se la riga È uno dei candidati oppure se è un articolo NUOVO.\\n\\nCRITERI\\n- Stesso master solo se è lo stesso prodotto: stessa natura, taglio, razza o varietà, origine o denominazione, livello qualitativo, stagionatura. Per vini e distillati contano anche produttore, cuvée e annata.\\n- NON distinguono: fornitore, lingua, codice articolo, marca dell'imballo, formato della confezione (lo stesso olio in tanica da 5 lt o in bottiglia da 0,75 lt è lo stesso master).\\n- Nel lusso la precisione conta: \\\"Filetto di Fassona piemontese\\\" e \\\"Filetto di Black Angus\\\" sono master DIVERSI; \\\"Parmigiano Reggiano 24 mesi\\\" e \\\"36 mesi\\\" sono DIVERSI. Un candidato generico non va bene per una riga specifica, e viceversa.\\n- Se nessun candidato è lo stesso prodotto, la decisione è \\\"nuovo\\\".\\n- Due righe che sono lo stesso prodotto nuovo devono avere lo stesso identico nome.\\n\\nCONFIDENZA (da 0 a 1)\\n- 0.90 o più: sei certo. 0.60–0.89: probabile, ma una persona dovrebbe verificare. Sotto 0.60: dubbio.\\n- Nel dubbio abbassa la confidenza: un abbinamento sbagliato falsa lo storico dei prezzi.\\n\\nPER GLI ARTICOLI NUOVI\\n- nome: italiano, standard e specifico, senza fornitore, senza codici e senza formato della confezione. Esempio: \\\"Olio extravergine d'oliva ligure\\\".\\n- categoria: scegline una dall'elenco fornito; proponine una nuova solo se nessuna è adatta.\\n- unita_base: \\\"kg\\\" per gli alimenti venduti a peso, \\\"lt\\\" per i liquidi, \\\"pz\\\" per ciò che si conta a pezzi, \\\"conf\\\" o \\\"mt\\\" solo se non è possibile altro.\\n\\nFATTORE DI CONVERSIONE\\n- fattore_conversione: quante unità base del master contiene UNA unità di vendita della riga. Esempi: riga a \\\"conf\\\" di un cartone 6 × 1 lt con base lt → 6; bottiglia da 75 cl venduta a \\\"pz\\\" con base lt → 0.75.\\n- Usa null quando l'unità di vendita coincide già con l'unità base, quando la riga riporta il peso reale, oppure quando non è determinabile con certezza.\\n\\nRISPOSTA\\nRestituisci ESCLUSIVAMENTE questo JSON, con una decisione per ogni riga ricevuta:\\n{\\\"decisioni\\\":[{\\\"alias_id\\\":\\\"…\\\",\\\"decisione\\\":\\\"master|nuovo\\\",\\\"master_id\\\":null,\\\"confidenza\\\":0.0,\\\"motivazione\\\":\\\"una frase in italiano\\\",\\\"fattore_conversione\\\":null,\\\"nuovo\\\":{\\\"nome\\\":\\\"\\\",\\\"categoria\\\":\\\"\\\",\\\"unita_base\\\":\\\"kg\\\"}}]}\\nPer \\\"master\\\" indica master_id e metti nuovo a null; per \\\"nuovo\\\" metti master_id a null.\";\nreturn [{ json: {\n  documento_id: prep.documento_id,\n  richiesta: {\n    model: 'claude-sonnet-5-5',\n    max_tokens: 8000,\n    system: SYSTEM,\n    messages: [{ role: 'user', content: JSON.stringify({ fornitore: prep.fornitore, categorie: prep.categorie, righe: prep.incerti }) + '\\n\\nRestituisci solo il JSON delle decisioni.' }]\n  }\n} }];\n"
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Giudice Claude",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     3080,
+     -320
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://api.anthropic.com/v1/messages",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "anthropicApi",
+     "sendHeaders": true,
+     "headerParameters": {
+      "parameters": [
+       {
+        "name": "anthropic-version",
+        "value": "2023-06-01"
+       }
+      ]
+     },
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify($json.richiesta) }}",
+     "options": {
+      "timeout": 120000
+     }
+    },
+    "credentials": {
+     "anthropicApi": {
+      "id": "fipL8XkNarm3odbX",
+      "name": "Anthropic account"
+     }
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Interpreta decisioni",
+    "type": "n8n-nodes-base.code",
+    "typeVersion": 2,
+    "position": [
+     3300,
+     -320
+    ],
+    "parameters": {
+     "mode": "runOnceForAllItems",
+     "language": "javaScript",
+     "jsCode": "// Legge le decisioni del giudice. In caso di risposta non valida non blocca il documento:\n// le righe restano \"da abbinare\" e finiscono nella coda di validazione.\nlet decisioni = [];\ntry {\n  const res = $input.first().json;\n  const text = (res.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();\n  const raw = text.replace(/^```(?:json)?\\s*/i, '').replace(/```\\s*$/, '');\n  const data = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));\n  if (Array.isArray(data.decisioni)) decisioni = data.decisioni;\n} catch (err) {\n  decisioni = [];\n}\nreturn [{ json: {\n  p_documento_id: $('Ricevi documento').first().json.body.documento_id,\n  p_decisioni: decisioni\n} }];\n"
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Applica abbinamenti",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     3520,
+     -320
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/rest/v1/rpc/applica_abbinamenti",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ p_documento_id: $json.p_documento_id, p_decisioni: $json.p_decisioni }) }}",
+     "options": {}
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Completa documento",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     3740,
+     -200
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/rest/v1/rpc/completa_documento",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ p_documento_id: $('Ricevi documento').first().json.body.documento_id }) }}",
+     "options": {}
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "addNode",
+   "node": {
+    "name": "Segna errore",
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.5,
+    "position": [
+     1540,
+     160
+    ],
+    "parameters": {
+     "method": "POST",
+     "url": "https://zbvmkrgxwwjritdarvzh.supabase.co/rest/v1/rpc/segna_errore",
+     "authentication": "predefinedCredentialType",
+     "nodeCredentialType": "supabaseApi",
+     "sendBody": true,
+     "specifyBody": "json",
+     "jsonBody": "={{ JSON.stringify({ p_documento_id: $('Ricevi documento').first().json.body.documento_id, p_messaggio: ($json.error && ($json.error.message || $json.error.description)) || (typeof $json.error === 'string' ? $json.error : null) || $json.message || 'Errore durante l\\'elaborazione del documento' }) }}",
+     "options": {}
+    },
+    "credentials": {
+     "supabaseApi": {
+      "id": "f1J62kcTZ1O057Wb",
+      "name": "Supabase account"
+     }
+    }
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Scarica file",
+   "settings": {
+    "onError": "continueErrorOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Prepara richiesta Claude",
+   "settings": {
+    "onError": "continueErrorOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Estrai dati con Claude",
+   "settings": {
+    "onError": "continueErrorOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Valida e normalizza JSON",
+   "settings": {
+    "onError": "continueErrorOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Registra documento",
+   "settings": {
+    "onError": "continueErrorOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Calcola embedding",
+   "settings": {
+    "onError": "continueRegularOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Prepara abbinamento",
+   "settings": {
+    "onError": "continueRegularOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Prepara giudice",
+   "settings": {
+    "onError": "continueRegularOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Giudice Claude",
+   "settings": {
+    "onError": "continueRegularOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Interpreta decisioni",
+   "settings": {
+    "onError": "continueRegularOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Applica abbinamenti",
+   "settings": {
+    "onError": "continueRegularOutput"
+   }
+  },
+  {
+   "type": "setNodeSettings",
+   "nodeName": "Completa documento",
+   "settings": {
+    "retryOnFail": true,
+    "maxTries": 3,
+    "waitBetweenTries": 2000
+   }
+  },
+  {
+   "type": "addConnection",
+   "source": "Ricevi documento",
+   "target": "Rispondi 202 Accepted"
+  },
+  {
+   "type": "addConnection",
+   "source": "Rispondi 202 Accepted",
+   "target": "Avvia elaborazione"
+  },
+  {
+   "type": "addConnection",
+   "source": "Avvia elaborazione",
+   "target": "Documento da elaborare?"
+  },
+  {
+   "type": "addConnection",
+   "source": "Documento da elaborare?",
+   "target": "Scarica file"
+  },
+  {
+   "type": "addConnection",
+   "source": "Scarica file",
+   "target": "Prepara richiesta Claude"
+  },
+  {
+   "type": "addConnection",
+   "source": "Registra documento",
+   "target": "Nuovo documento?"
+  },
+  {
+   "type": "addConnection",
+   "source": "Nuovo documento?",
+   "target": "Calcola embedding"
+  },
+  {
+   "type": "addConnection",
+   "source": "Calcola embedding",
+   "target": "Prepara abbinamento"
+  },
+  {
+   "type": "addConnection",
+   "source": "Prepara abbinamento",
+   "target": "Casi incerti?"
+  },
+  {
+   "type": "addConnection",
+   "source": "Casi incerti?",
+   "target": "Prepara giudice"
+  },
+  {
+   "type": "addConnection",
+   "source": "Prepara giudice",
+   "target": "Giudice Claude"
+  },
+  {
+   "type": "addConnection",
+   "source": "Giudice Claude",
+   "target": "Interpreta decisioni"
+  },
+  {
+   "type": "addConnection",
+   "source": "Interpreta decisioni",
+   "target": "Applica abbinamenti"
+  },
+  {
+   "type": "addConnection",
+   "source": "Applica abbinamenti",
+   "target": "Completa documento"
+  },
+  {
+   "type": "addConnection",
+   "source": "Casi incerti?",
+   "target": "Completa documento",
+   "sourceIndex": 1
+  },
+  {
+   "type": "addConnection",
+   "source": "Scarica file",
+   "target": "Segna errore",
+   "sourceIndex": 1
+  },
+  {
+   "type": "addConnection",
+   "source": "Prepara richiesta Claude",
+   "target": "Segna errore",
+   "sourceIndex": 1
+  },
+  {
+   "type": "addConnection",
+   "source": "Estrai dati con Claude",
+   "target": "Segna errore",
+   "sourceIndex": 1
+  },
+  {
+   "type": "addConnection",
+   "source": "Valida e normalizza JSON",
+   "target": "Segna errore",
+   "sourceIndex": 1
+  },
+  {
+   "type": "addConnection",
+   "source": "Registra documento",
+   "target": "Segna errore",
+   "sourceIndex": 1
+  },
+  {
+   "type": "setNodeGroups",
+   "nodeGroups": [
+    {
+     "name": "1 · Ricezione",
+     "description": "Risponde subito 202 e prende in carico il documento (transizione atomica in_coda → elaborazione)",
+     "nodeNames": [
+      "Rispondi 202 Accepted",
+      "Avvia elaborazione",
+      "Documento da elaborare?"
+     ]
+    },
+    {
+     "name": "2 · Estrazione AI",
+     "description": "Scarica il file dallo storage, estrae i dati con Claude, li valida e li registra",
+     "nodeNames": [
+      "Scarica file",
+      "Prepara richiesta Claude",
+      "Estrai dati con Claude",
+      "Valida e normalizza JSON",
+      "Registra documento",
+      "Nuovo documento?",
+      "Segna errore"
+     ]
+    },
+    {
+     "name": "3 · Abbinamento al catalogo",
+     "description": "Alias esatto in SQL, candidati per somiglianza (trigrammi + embedding), Claude come giudice sui casi incerti",
+     "nodeNames": [
+      "Calcola embedding",
+      "Prepara abbinamento",
+      "Casi incerti?",
+      "Prepara giudice",
+      "Giudice Claude",
+      "Interpreta decisioni",
+      "Applica abbinamenti",
+      "Completa documento"
+     ]
+    }
+   ]
+  },
+  {
+   "type": "setWorkflowMetadata",
+   "description": "Riceve {documento_id}, risponde 202, scarica il file da Supabase Storage, estrae i dati con Claude, li registra e abbina gli articoli al catalogo master (alias → somiglianza → giudice AI)."
+  }
+ ]
+}

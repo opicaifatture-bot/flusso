@@ -8,7 +8,10 @@ export async function accedi(formData: FormData) {
     email: String(formData.get("email")),
     password: String(formData.get("password")),
   });
-  if (error) redirect(`/login?errore=${encodeURIComponent(error.message)}`);
+  if (error) {
+    const messaggio = /invalid login/i.test(error.message) ? "Email o password non corretti" : error.message;
+    redirect(`/login?errore=${encodeURIComponent(messaggio)}`);
+  }
   redirect("/");
 }
 
