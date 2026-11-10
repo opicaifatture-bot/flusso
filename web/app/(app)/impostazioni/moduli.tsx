@@ -5,7 +5,8 @@ import { ShieldAlert, ShieldCheck, Trash2 } from "lucide-react";
 import { RUOLI, type Esito, type Ristorante, type Ruolo } from "@/lib/tipi";
 import { Badge } from "@/components/ui";
 import { dataOra } from "@/lib/format";
-import { aggiungiMembro, leggiAudit, rimuoviMembro, salvaSede, verificaAudit, type EsitoAudit, type VoceAudit } from "./actions";
+import { Azione } from "@/components/modulo";
+import { aggiungiMembro, invita, leggiAudit, rimuoviMembro, salvaSede, verificaAudit, type EsitoAudit, type EsitoInvito, type VoceAudit } from "./actions";
 
 function Messaggio({ esito, ok }: { esito: Esito | null; ok: string }) {
   if (!esito) return null;
@@ -102,7 +103,10 @@ export function ModuloTeam({ membri, io }: { membri: { user_id: string; email: s
               ["Correggere numero, data, valuta e totali del documento", 1, 0, 1, 0],
               ["Validare gli abbinamenti al catalogo", 1, 1, 0, 0],
               ["Approvare rincari e articoli master, unire, scollegare", 1, 0, 0, 0],
-              ["Impostazioni della sede e team", 1, 0, 0, 0],
+              ["Registrare letture, lotti, movimenti, ricette, interventi", 1, 1, 0, 0],
+              ["Registrare vendite, consegne e non conformità", 1, 1, 1, 0],
+              ["Soglie delle celle, sensori, trasferimenti tra sedi, approvare ordini", 1, 0, 0, 0],
+              ["Impostazioni della sede, inviti e team", 1, 0, 0, 0],
               ["Consultare e verificare il registro di audit", 1, 0, 1, 0],
               ["Vedere gli indirizzi IP nel registro", 1, 0, 0, 0],
             ] as [string, number, number, number, number][]).map(([azione, ...p]) => (
@@ -206,6 +210,75 @@ export function RegistroAudit({ iniziali, io, vedeIp }: { iniziali: VoceAudit[];
         </table>
       </div>
       {!finito && <button disabled={inCorso} onClick={() => carica({ origine, tabella }, true)} className="btn mt-3">Mostra le precedenti</button>}
+    </div>
+  );
+}
+
+export type InvitoRiga = {
+  id: string; email: string; ruolo: Ruolo; ristorante_id: string | null; stato: string; scade_il: string;
+  invio_stato: string; invio_errore: string | null; invii: number; creato_il: string;
+};
+const STATI_INVITO: Record<string, { testo: string; tono: "neutro" | "ok" | "warn" | "danger" | "info" }> = {
+  in_attesa: { testo: "In attesa", tono: "info" }, accettato: { testo: "Accettato", tono: "ok" },
+  scaduto: { testo: "Scaduto", tono: "warn" }, revocato: { testo: "Revocato", tono: "neutro" },
+};
+
+/** Invito di un collaboratore: email, ruolo, ambito. La password la crea l'invitato. */
+export function ModuloInviti({ inviti, sede, puoGruppo, emailAttiva }: { inviti: InvitoRiga[]; sede: string; puoGruppo: boolean; emailAttiva: boolean }) {
+  const [esito, azione, inCorso] = useActionState<Esito<EsitoInvito> | null, FormData>(invita, null);
+  const ora = Date.now();
+  return (
+    <div>
+      {!emailAttiva && (
+        <p className="mb-3 rounded-lg border border-warn/25 bg-warn-soft px-3 py-2 text-xs text-warn">
+          Invio automatico delle email non configurato: dopo aver creato l&apos;invito ti verrà mostrato il collegamento da consegnare di persona.
+        </p>
+      )}
+      <form action={azione} className="grid gap-3 sm:grid-cols-[1fr_9rem_11rem_auto] sm:items-end">
+        <div><label className="label" htmlFor="i-email">Email del collaboratore</label><input id="i-email" name="email" type="email" required placeholder="nome@esempio.it" className="input" /></div>
+        <div><label className="label" htmlFor="i-ruolo">Ruolo</label>
+          <select id="i-ruolo" name="ruolo" defaultValue="chef" className="input" aria-describedby="i-nota">
+            {(Object.keys(RUOLI) as Ruolo[]).map((r) => <option key={r} value={r}>{RUOLI[r]}</option>)}
+          </select></div>
+        <div><label className="label" htmlFor="i-ambito">Accesso a</label>
+          <select id="i-ambito" name="ambito" defaultValue="sede" className="input">
+            <option value="sede">{sede}</option>
+            {puoGruppo && <option value="gruppo">Tutte le sedi del gruppo</option>}
+          </select></div>
+        <input type="hidden" name="giorni" value="7" />
+        <button disabled={inCorso} className="btn btn-primary">Invita</button>
+      </form>
+      <p id="i-nota" className="mt-2 text-[11px] text-subtle">
+        L&apos;invito scade dopo 7 giorni e si usa una sola volta. La persona sceglie la propria password e conferma l&apos;email; se ha già un account, accede e viene aggiunta senza crearne un secondo. Cosa potrà fare è nella tabella dei permessi qui sotto.
+      </p>
+      {esito && !esito.ok && <p role="alert" className="mt-2 text-xs text-danger">{esito.errore}</p>}
+      {esito?.ok && esito.dati && (
+        <div role="status" className={`mt-3 rounded-lg border p-3 text-xs ${esito.dati.inviata ? "border-ok/25 bg-ok-soft text-ok" : "border-warn/30 bg-warn-soft"}`}>
+          <p className={esito.dati.inviata ? "" : "font-medium text-warn"}>{esito.dati.nota}</p>
+          {esito.dati.link && <p className="num mt-2 select-all break-all text-fg">{esito.dati.link}</p>}
+        </div>
+      )}
+
+      {inviti.length > 0 && (
+        <ul className="mt-4 divide-y divide-line rounded-lg border border-line">
+          {inviti.map((i) => {
+            const stato = i.stato === "in_attesa" && new Date(i.scade_il).getTime() < ora ? "scaduto" : i.stato;
+            const s = STATI_INVITO[stato] ?? STATI_INVITO.in_attesa;
+            return (
+              <li key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2.5 text-[13px]">
+                <span className="min-w-0 flex-1 truncate">{i.email}</span>
+                <span className="text-xs text-muted">{RUOLI[i.ruolo]} · {i.ristorante_id ? "sede" : "gruppo"}</span>
+                <Badge tono={s.tono}>{s.testo}</Badge>
+                {stato === "in_attesa" && (i.invio_stato === "inviato"
+                  ? <span className="text-xs text-subtle">email inviata · scade il {dataOra(i.scade_il)}</span>
+                  : <span className="text-xs text-warn" title={i.invio_errore ?? undefined}>{i.invio_stato === "fallito" ? "email non inviata" : "da consegnare"} · scade il {dataOra(i.scade_il)}</span>)}
+                {stato === "in_attesa" && <Azione rpc="revoca_invito" parametri={{ p_invito_id: i.id }} etichetta="Revoca" stile="btn btn-ghost btn-sm" conferma={`Revocare l'invito a ${i.email}? Il collegamento smetterà di funzionare.`} />}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <p className="mt-2 text-[11px] text-subtle">Per inviare di nuovo o cambiare ruolo a un invito in attesa, invita la stessa email: il collegamento precedente viene annullato.</p>
     </div>
   );
 }

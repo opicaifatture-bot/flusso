@@ -1,11 +1,14 @@
-import { cruscotto, sessione } from "@/lib/sessione";
+import { cruscotto, pianoCorrente, sessione } from "@/lib/sessione";
 import { Shell } from "@/components/shell";
 
 export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, sedi, attivo, ruolo } = await sessione();
-  const k = attivo ? await cruscotto(attivo.id, 90) : null;
+  const { supabase, user, sedi, attivo, ruolo } = await sessione();
+  const [k, piano, allarmi] = attivo ? await Promise.all([
+    cruscotto(attivo.id, 90), pianoCorrente(attivo.gruppo_id),
+    supabase.from("allarmi").select("id", { count: "exact", head: true }).eq("ristorante_id", attivo.id).neq("stato", "risolto"),
+  ]) : [null, null, null];
 
   return (
     <Shell
@@ -18,7 +21,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         validazione: (k?.da_validare ?? 0) + (k?.master_in_bozza ?? 0),
         rincari: k?.rincari_aperti ?? 0,
         lavorazione: k?.in_lavorazione ?? 0,
+        allarmi: allarmi?.count ?? 0,
       }}
+      funzioni={piano?.funzioni ?? []}
     >
       {attivo ? children : (
         <div className="card mx-auto mt-16 max-w-md p-8 text-center">

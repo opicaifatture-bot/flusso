@@ -1,4 +1,6 @@
-# Price Guardian Enterprise
+# Kitchen OS Enterprise (già Price Guardian)
+
+> I moduli operativi (magazzino, celle, ricette, fornitori, cantina, manutenzione, piani, inviti) sono descritti in [docs/kitchen-os.md](docs/kitchen-os.md).
 
 Contabilità invisibile e controllo prezzi per la ristorazione di lusso cross-border (Italia, Francia, Monaco, Svizzera).
 

@@ -20,5 +20,6 @@ for m in "$qui"/../migrations/*.sql; do
   esegui "$tmp.sql"; rm -f "$tmp.sql"
 done
 esegui "$qui/10_strumenti.sql"
-psql -d "$db" -f "$qui/20_test.sql" 2>&1 | grep -vE '^(NOTICE|WARNING|HINT)' | tee "$tmp"
+for t in "$qui"/[2-9][0-9]_*.sql; do psql -d "$db" -f "$t" 2>&1 | grep -vE '^(NOTICE|WARNING|HINT)'; done | tee "$tmp"
+if grep -q 'ERROR' "$tmp"; then echo "ERRORE durante i test"; exit 1; fi
 grep -q 'TUTTI I TEST SUPERATI' "$tmp"

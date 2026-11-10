@@ -18,7 +18,10 @@ export async function middleware(request: NextRequest) {
     }
   );
   const { data: { user } } = await supabase.auth.getUser();
-  const login = request.nextUrl.pathname.startsWith("/login");
+  const percorso = request.nextUrl.pathname;
+  // Pagine e rotte che gestiscono da sole l'autenticazione: invito, conferma email, ingestione sensori, webhook.
+  if (percorso.startsWith("/invito") || percorso.startsWith("/auth") || percorso.startsWith("/api/")) return response;
+  const login = percorso.startsWith("/login");
   if (user && login) {
     const url = request.nextUrl.clone();
     url.pathname = "/";

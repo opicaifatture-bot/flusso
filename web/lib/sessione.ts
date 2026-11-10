@@ -54,6 +54,29 @@ export async function sessioneSede() {
   return { ...s, attivo: s.attivo, ruolo: s.ruolo };
 }
 
+export type Piano = {
+  piano: string; nome: string; stato: "prova" | "attivo" | "scaduto" | "sospeso" | "annullato";
+  prova_fino_al: string | null; periodo_fine: string | null; provider: string; funzioni: string[];
+  limiti: Record<string, number | null>; utenti: number; sedi: number;
+};
+
+/** Piano del gruppo attivo. Serve solo a mostrare o nascondere: i controlli veri sono nel database. */
+export const pianoCorrente = cache(async (gruppoId: string): Promise<Piano | null> => {
+  const { supabase } = await sessione();
+  const { data } = await supabase.rpc("piano_corrente", { p_gruppo_id: gruppoId });
+  return (data as Piano) ?? null;
+});
+
+/** Sede attiva più verifica che il piano includa la funzione e consenta di scrivere. */
+export async function sessioneModulo(funzione: string) {
+  const s = await sessioneSede();
+  const piano = await pianoCorrente(s.attivo.gruppo_id);
+  const inclusa = !!piano?.funzioni.includes(funzione);
+  const scrivibile = inclusa && (piano?.stato === "prova" || piano?.stato === "attivo");
+  const operativo = s.ruolo === "titolare" || s.ruolo === "chef";
+  return { ...s, piano, inclusa, scrivibile, operativo: operativo && scrivibile, titolare: s.ruolo === "titolare" && scrivibile };
+}
+
 export const PERIODI = [30, 90, 365] as const;
 
 /** Indicatori della sede per un periodo (giorni fino a oggi, per data documento). */

@@ -8,7 +8,7 @@ do $$ begin
 end $$;
 create schema auth; create schema storage; create schema extensions; create schema cron;
 grant usage on schema auth, storage, extensions, public to anon, authenticated, service_role;
-create table auth.users (id uuid primary key default gen_random_uuid(), email text);
+create table auth.users (id uuid primary key default gen_random_uuid(), email text, email_confirmed_at timestamptz default now());
 create function auth.uid() returns uuid language sql stable as
   $$ select nullif(nullif(current_setting('request.jwt.claims', true), '')::json->>'sub', '')::uuid $$;
 create function auth.role() returns text language sql stable as

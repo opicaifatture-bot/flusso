@@ -243,17 +243,5 @@ select t.rifiuta('audit', 'TRUNCATE del registro', 'truncate audit_log', 'immuta
 set role service_role;
 select t.rifiuta('audit', 'il ruolo di servizio non scrive nel registro', 'insert into audit_log (gruppo_id, seq, tabella, operazione, origine, creato_il, hash_precedente, hash) values (gen_random_uuid(), 1, ''x'', ''INSERT'', ''x'', now(), ''x'', ''x'')', 'permission denied');
 reset role;
-alter table audit_log disable trigger audit_log_no_modifica;
-update audit_log set dopo = '{"manomesso": true}' where gruppo_id = :'g1' and seq = 7;
-select t.uguale('audit', 'contenuto alterato: rilevato alla riga giusta', (select prima_anomalia_seq from verifica_audit(:'g1')), 7::bigint);
-delete from audit_log where gruppo_id = :'g2' and seq = 3;
-select t.uguale('audit', 'riga intermedia cancellata: rilevata', (select prima_anomalia_seq from verifica_audit(:'g2')), 3::bigint);
-alter table audit_log enable trigger audit_log_no_modifica;
 
--- ═══ ESITO ═════════════════════════════════════════════════════════════════
-\pset format aligned
-\pset tuples_only off
-select area, nome, dettaglio from t.esiti where not ok order by id;
-select count(*) filter (where ok) as superati, count(*) filter (where not ok) as falliti from t.esiti;
-select case when bool_and(ok) then 'TUTTI I TEST SUPERATI' else 'TEST FALLITI' end as esito from t.esiti \gset
-\echo :esito
+

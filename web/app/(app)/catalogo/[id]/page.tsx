@@ -8,6 +8,7 @@ import { motivoConfronto } from "@/lib/controlli";
 import type { Riga } from "@/lib/tipi";
 import { Badge, Kpi, Paese, Variazione, Vuoto } from "@/components/ui";
 import { ModuloMaster, RevocaAlias, UnisciIn } from "./scheda";
+import { Modulo } from "@/components/modulo";
 
 export const metadata: Metadata = { title: "Articolo" };
 
@@ -34,6 +35,8 @@ export default async function Articolo({ params }: { params: Promise<{ id: strin
     supabase.rpc("master_simili", { p_master_id: id }),
     supabase.from("categorie_master").select("nome").eq("gruppo_id", m.gruppo_id).order("nome").returns<{ nome: string }[]>(),
   ]);
+  const { data: conversioni } = await supabase.from("conversioni_unita").select("id,da_unita,a_unita,fattore,provenienza,nota,versione,creato_il").eq("master_id", id).eq("attiva", true).order("da_unita")
+    .returns<{ id: string; da_unita: string; a_unita: string; fattore: number; provenienza: string; nota: string | null; versione: number; creato_il: string }[]>();
   const righe = acquisti ?? [];
   const aperti = righe.filter((r) => r.anomalia_prezzo && r.anomalia_stato === "aperta").length;
   const nonConfrontabili = righe.filter((r) => r.confronto_esito === "unita_non_confrontabile").length;
@@ -57,7 +60,7 @@ export default async function Articolo({ params }: { params: Promise<{ id: strin
           nota={nonConfrontabili ? `Righe in unità diversa da ${m.unita_base}, senza peso o contenuto` : "Tutte le righe sono confrontabili"} />
       </div>
 
-      {permessi.approvareMaster && (
+      {permessi.validare && (
         <section className="card mt-3 p-4" aria-labelledby="t-mod">
           <h2 id="t-mod" className="text-[13px] font-medium">Nome, categoria e unità base</h2>
           <p className="mb-3 text-xs text-muted">Valgono per tutte le sedi del gruppo. Cambiando l&apos;unità base, prezzi e rincari di questo articolo vengono ricalcolati.</p>
@@ -131,6 +134,24 @@ export default async function Articolo({ params }: { params: Promise<{ id: strin
             </table>
           </div>
         ) : <Vuoto compatto titolo="Nessun acquisto in questa sede" />}
+      </section>
+
+      <section className="card mt-3 p-4" aria-labelledby="t-conv">
+        <h2 id="t-conv" className="text-[13px] font-medium">Conversioni tra unità</h2>
+        <p className="text-xs text-muted">Tra peso e peso o volume e volume la conversione è automatica. Tra pezzi, confezioni, peso e volume vale solo ciò che dichiari qui: l&apos;app non ipotizza pesi medi.</p>
+        {(conversioni ?? []).length ? (
+          <ul className="mt-2 space-y-1 text-[13px]">{(conversioni ?? []).map((c) => (
+            <li key={c.id} className="flex flex-wrap items-center gap-2"><span className="num">1 {c.da_unita} = {num(c.fattore, 6)} {c.a_unita}</span><Badge>{c.provenienza}</Badge><span className="text-xs text-subtle">v{c.versione} · {data(c.creato_il)}{c.nota ? ` · ${c.nota}` : ""}</span></li>
+          ))}</ul>
+        ) : <p className="mt-2 text-xs text-subtle">Nessuna conversione dichiarata.</p>}
+        {permessi.validare && (
+          <div className="mt-3 border-t border-line pt-3">
+            <Modulo rpc="imposta_conversione" fissi={{ p_master_id: m.id, p_provenienza: "manuale" }} compatto invio="Dichiara" fatto="Conversione salvata"
+              conferma="Una conversione cambia i costi delle ricette e le giacenze che la usano. Quella precedente resta archiviata. Confermi?"
+              campi={[{ nome: "p_da", etichetta: "1 unità di", richiesto: true, segnaposto: "es. pz" }, { nome: "p_a", etichetta: "equivale a (unità)", richiesto: true, segnaposto: "es. kg" },
+                { nome: "p_fattore", etichetta: "Quantità", tipo: "numero", richiesto: true, segnaposto: "es. 0,35" }, { nome: "p_nota", etichetta: "Da dove viene il dato", segnaposto: "es. pesata del 3 marzo" }]} />
+          </div>
+        )}
       </section>
     </div>
   );

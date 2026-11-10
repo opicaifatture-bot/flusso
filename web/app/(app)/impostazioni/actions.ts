@@ -1,5 +1,9 @@
 "use server";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { emailConfigurata, inviaEmail, modelloInvito } from "@/lib/email";
+import { data as fmtData } from "@/lib/format";
+import { RUOLI } from "@/lib/tipi";
 import { sessioneSede } from "@/lib/sessione";
 import { messaggioErrore } from "@/lib/format";
 import type { Esito, Ruolo } from "@/lib/tipi";
@@ -69,3 +73,35 @@ export async function leggiAudit(filtri: { origine?: string; tabella?: string; p
   if (error) return { ok: false, errore: messaggioErrore(error) };
   return { ok: true, dati: (data ?? []) as VoceAudit[] };
 }
+
+export type EsitoInvito = { inviata: boolean; link: string | null; nota: string };
+
+/**
+ * Crea (o rinnova) un invito e prova a inviarlo. Il token esiste solo qui e nel link:
+ * non viene salvato né scritto nei log. Se l'email non parte, il link viene restituito
+ * al titolare perché lo consegni di persona, e l'invito resta marcato come non inviato.
+ */
+export async function invita(_: Esito<EsitoInvito> | null, form: FormData): Promise<Esito<EsitoInvito>> {
+  const { supabase, attivo, user } = await sessioneSede();
+  const ruolo = String(form.get("ruolo")) as Ruolo;
+  const { data, error } = await supabase.rpc("crea_invito", {
+    p_ristorante_id: attivo.id, p_email: String(form.get("email") ?? ""), p_ruolo: ruolo,
+    p_intero_gruppo: form.get("ambito") === "gruppo", p_giorni_validita: Number(form.get("giorni") || 7),
+  });
+  if (error) return { ok: false, errore: messaggioErrore(error) };
+  const h = await headers();
+  const link = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}/invito/${data.token}`;
+  const esito = await inviaEmail(String(form.get("email")).trim().toLowerCase(), modelloInvito({
+    sede: form.get("ambito") === "gruppo" ? (attivo.gruppi?.nome ?? attivo.nome) : attivo.nome,
+    ruolo: RUOLI[ruolo], link, scadenza: fmtData(data.scade_il), invitante: user.email ?? "Il titolare",
+  }));
+  await supabase.rpc("segna_invio_invito", { p_invito_id: data.invito_id, p_riuscito: esito.inviata, p_errore: esito.inviata ? null : esito.dettaglio });
+  revalidatePath("/impostazioni");
+  return { ok: true, dati: esito.inviata
+    ? { inviata: true, link: null, nota: data.rinnovato ? "Invito rinnovato e inviato di nuovo: il collegamento precedente non vale più." : "Invito inviato." }
+    : { inviata: false, link, nota: esito.motivo === "non_configurata"
+        ? "L'invio automatico delle email non è configurato: copia il collegamento e consegnalo alla persona. Non verrà più mostrato."
+        : `Invio non riuscito (${esito.dettaglio}): copia il collegamento e consegnalo tu. Non verrà più mostrato.` } };
+}
+
+export async function emailAttiva() { return emailConfigurata(); }
