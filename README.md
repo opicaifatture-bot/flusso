@@ -35,17 +35,19 @@ n8n: scarica il file → Claude estrae → registra_documento → abbinamento al
 
 ## Audit trail
 
-Ogni INSERT/UPDATE/DELETE sulle tabelle contabili scrive in `audit_log`: valori prima e dopo, utente, origine (app, n8n, sql), IP dichiarato dall'app e IP della connessione. Le righe sono concatenate con SHA-256, una catena per gruppo, serializzata con `pg_advisory_xact_lock`. UPDATE, DELETE e TRUNCATE sono bloccati da trigger e i privilegi di scrittura sono revocati a tutti i ruoli API.
+Ogni INSERT/UPDATE/DELETE sulle tabelle contabili scrive in `audit_log`: valori prima e dopo, utente, origine (app, n8n, sql), IP dichiarato dall'app e IP della connessione. L'app legge il registro con la RPC `registro_audit`: titolare e contabile lo consultano, l'IP è restituito solo al titolare (le colonne IP della tabella non sono leggibili dai ruoli API). Le righe sono concatenate con SHA-256, una catena per gruppo, serializzata con `pg_advisory_xact_lock`. UPDATE, DELETE e TRUNCATE sono bloccati da trigger e i privilegi di scrittura sono revocati a tutti i ruoli API.
 
 ```sql
 select * from verifica_audit();   -- sequenza, concatenazione e hash ricalcolato
 ```
 
-Il primo di ogni mese il registro del mese precedente viene archiviato nel bucket `archivio-audit` insieme all'ultimo hash, che fa da ancora esterna. Nota: questo registro non sostituisce la conservazione a norma delle fatture elettroniche.
+Il primo di ogni mese il registro del mese precedente viene archiviato nel bucket `archivio-audit` insieme all'ultimo hash, che fa da ancora esterna: senza di essa la verifica non può rilevare la rimozione delle ultime righe da parte di chi amministra il database. Nota: questo registro non sostituisce la conservazione a norma delle fatture elettroniche.
 
 ## Stati del documento
 
 `in_coda → elaborazione (estrazione → abbinamento) → completato`, oppure `errore` / `duplicato`.
+
+`completato` indica solo che l'elaborazione automatica è finita (nell'app: «Elaborato»). Il controllo umano è un indicatore separato, calcolato dalla vista `v_documenti`: «Da rivedere» finché ci sono articoli da validare o rincari da gestire, poi «Verificato».
 
 - **Idempotenza:** stesso file (SHA-256) nella stessa sede → non viene ricaricato. Stesso documento contabile (fornitore, tipo, numero, data) → marcato `duplicato`.
 - **Timeout:** `pg_cron` porta a `errore` i documenti fermi da più di 5 minuti; dall'app si può riprovare.
@@ -80,7 +82,24 @@ npm run dev
 
 Variabili d'ambiente (anche su Vercel): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_HEADER`, `N8N_WEBHOOK_TOKEN` (solo server).
 
-Pagine: Panoramica, Documenti, dettaglio affiancato (originale + dati modificabili), Carica, Da validare, Rincari, Catalogo, Impostazioni (sede, team, audit). Tema scuro «Midnight Obsidian» predefinito, tema chiaro opzionale.
+Pagine: Panoramica (periodo selezionabile, per data documento), Documenti, dettaglio affiancato (originale + dati modificabili), Carica, Da validare, Rincari, Catalogo e scheda articolo, Impostazioni (sede, team, audit). Date e orari sono sempre nel fuso Europe/Rome. Tema scuro «Midnight Obsidian» predefinito, tema chiaro opzionale.
+
+## Test
+
+```bash
+# Database: applica tutte le migrazioni a un PostgreSQL locale usa-e-getta e verifica
+# calcoli, unità, valute, stati, duplicati, permessi per ruolo e sede, audit.
+PGHOST=/tmp PGPORT=5432 PGUSER=postgres supabase/tests/esegui.sh
+
+# Web: controlli di coerenza (righe, totali, sconti), lettura dei numeri, validazione dei file.
+cd web && npm test
+```
+
+Regole verificate dai test, in breve: il rincaro si calcola sul prezzo netto di sconto, rispetto all'acquisto
+cronologicamente precedente dallo stesso fornitore, a parità di unità e valuta; scatta solo oltre la soglia
+percentuale (non pari) e, se impostato, oltre un maggior costo minimo in euro. Le note di credito non generano
+rincari né fanno da riferimento. Il controvalore in EUR usa il tasso BCE dei 10 giorni precedenti la data del
+documento; se manca, l'importo resta nella sua valuta e non entra nei totali in EUR.
 
 ## Limiti noti
 

@@ -27,10 +27,17 @@ export function StatoBadge({ stato, fase }: { stato: StatoDocumento; fase?: stri
   switch (stato) {
     case "in_coda": return <Badge pulsa>In coda</Badge>;
     case "elaborazione": return <Badge tono="info" pulsa>{fase === "abbinamento" ? "Abbinamento" : "Estrazione"}</Badge>;
-    case "completato": return <Badge tono="ok">Completato</Badge>;
+    case "completato": return <Badge>Elaborato</Badge>;
     case "duplicato": return <Badge tono="warn">Duplicato</Badge>;
     default: return <Badge tono="danger">Errore</Badge>;
   }
+}
+
+/** Controllo umano: un documento elaborato può avere ancora articoli da validare o rincari da gestire. */
+export function RevisioneBadge({ verificato, dettaglio }: { verificato: boolean; dettaglio?: string }) {
+  return verificato
+    ? <Badge tono="ok">Verificato</Badge>
+    : <Badge tono="warn" className="max-w-full"><span className="truncate" title={dettaglio}>Da rivedere</span></Badge>;
 }
 
 export function AnomaliaBadge({ stato }: { stato: StatoAnomalia | null }) {
@@ -89,9 +96,9 @@ export function Intestazione({ titolo, sottotitolo, children }: { titolo: string
   );
 }
 
-export function Vuoto({ titolo, children }: { titolo: string; children?: React.ReactNode }) {
+export function Vuoto({ titolo, children, compatto }: { titolo: string; children?: React.ReactNode; compatto?: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+    <div className={cn("flex flex-col items-center justify-center px-6 text-center", compatto ? "py-8" : "py-16")}>
       <p className="text-sm font-medium">{titolo}</p>
       {children && <div className="mt-1.5 max-w-sm text-[13px] text-muted">{children}</div>}
     </div>
@@ -106,7 +113,7 @@ export function Schede({ voci, attiva }: { voci: { href: string; chiave: string;
   return (
     <div className="flex gap-1 overflow-x-auto border-b border-line">
       {voci.map((v) => (
-        <Link key={v.chiave} href={v.href} scroll={false}
+        <Link key={v.chiave} href={v.href} scroll={false} aria-current={v.chiave === attiva ? "page" : undefined}
           className={cn("-mb-px flex items-center gap-2 whitespace-nowrap border-b-2 px-3 pb-2.5 pt-1 text-[13px] transition-colors duration-150",
             v.chiave === attiva ? "border-fg font-medium text-fg" : "border-transparent text-muted hover:text-fg")}>
           {v.etichetta}

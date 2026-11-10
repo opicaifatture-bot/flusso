@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
 import { sessioneSede } from "@/lib/sessione";
-import { dataOra } from "@/lib/format";
 import type { Ruolo } from "@/lib/tipi";
-import { Avviso, Badge, Intestazione } from "@/components/ui";
-import { ModuloSede, ModuloTeam, VerificaAudit } from "./moduli";
+import { Avviso, Intestazione } from "@/components/ui";
+import { ModuloSede, ModuloTeam, RegistroAudit, VerificaAudit } from "./moduli";
+import type { VoceAudit } from "./actions";
 
 export const metadata: Metadata = { title: "Impostazioni" };
-
-const TABELLE: Record<string, string> = {
-  documenti: "Documento", storico_prezzi: "Riga", alias_articolo: "Abbinamento", articoli_master: "Catalogo",
-  categorie_master: "Categoria", fornitori: "Fornitore", fornitori_ristorante: "Fornitore", ristoranti: "Sede",
-  gruppi: "Gruppo", membri_ristorante: "Team", membri_gruppo: "Team",
-};
-const OPERAZIONI: Record<string, string> = { INSERT: "Creazione", UPDATE: "Modifica", DELETE: "Eliminazione" };
-const ORIGINI: Record<string, string> = { app: "Web app", n8n: "Automazione", sql: "Database", sistema: "Sistema" };
-type Voce = { id: number; seq: number; tabella: string; operazione: string; origine: string; utente_id: string | null; ip: string | null; creato_il: string; dopo: Record<string, unknown> | null };
 
 function Sezione({ titolo, testo, children }: { titolo: string; testo: string; children: React.ReactNode }) {
   return (
@@ -32,8 +23,7 @@ export default async function Impostazioni() {
   }
   const [{ data: membri }, { data: registro }] = await Promise.all([
     permessi.impostazioni ? supabase.rpc("elenco_membri", { p_ristorante_id: attivo.id }) : Promise.resolve({ data: [] }),
-    supabase.from("audit_log").select("id,seq,tabella,operazione,origine,utente_id,ip,creato_il,dopo").eq("gruppo_id", attivo.gruppo_id)
-      .order("seq", { ascending: false }).limit(25).returns<Voce[]>(),
+    supabase.rpc("registro_audit", { p_gruppo_id: attivo.gruppo_id, p_limite: 25 }),
   ]);
 
   return (
@@ -47,28 +37,15 @@ export default async function Impostazioni() {
           </Sezione>
         </>
       )}
-      <Sezione titolo="Registro di audit" testo="Ogni modifica ai dati contabili viene registrata con autore, data e indirizzo IP. Le registrazioni sono concatenate con hash SHA-256: non si possono modificare né cancellare senza che la verifica lo rilevi.">
+      <Sezione titolo="Registro di audit" testo="Ogni creazione, modifica o eliminazione di dati contabili viene registrata dal database con autore, data e origine. Le registrazioni non si possono modificare né cancellare dall'app e sono concatenate con hash SHA-256.">
         <VerificaAudit />
-        <div className="mt-5 overflow-x-auto rounded-lg border border-line">
-          <table className="w-full min-w-[560px] text-xs">
-            <thead><tr><th className="th">N.</th><th className="th">Quando</th><th className="th">Cosa</th><th className="th">Origine</th><th className="th">Autore</th><th className="th">IP</th></tr></thead>
-            <tbody>
-              {(registro ?? []).map((v) => (
-                <tr key={v.id} className="riga">
-                  <td className="td num text-subtle">{v.seq}</td>
-                  <td className="td num whitespace-nowrap text-muted">{dataOra(v.creato_il)}</td>
-                  <td className="td">{OPERAZIONI[v.operazione] ?? v.operazione} · <span className="text-muted">{TABELLE[v.tabella] ?? v.tabella}</span>
-                    {v.operazione === "UPDATE" && v.dopo && <span className="text-subtle"> ({Object.keys(v.dopo).slice(0, 3).join(", ")}{Object.keys(v.dopo).length > 3 ? "…" : ""})</span>}
-                  </td>
-                  <td className="td"><Badge tono={v.origine === "app" ? "info" : "neutro"}>{ORIGINI[v.origine] ?? v.origine}</Badge></td>
-                  <td className="td text-muted">{v.utente_id ? (v.utente_id === user.id ? "Tu" : `…${v.utente_id.slice(-4)}`) : "—"}</td>
-                  <td className="td num text-subtle">{v.ip ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-2 text-[11px] text-subtle">Ultime 25 registrazioni. Il primo di ogni mese il registro del mese precedente viene archiviato nel bucket protetto «archivio-audit».</p>
+        <ul className="mt-3 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-subtle">
+          <li>La verifica ricalcola tutta la catena: rileva una registrazione alterata o cancellata in mezzo. Non può rilevare, da sola, la rimozione delle ultime registrazioni da parte di chi amministra il database.</li>
+          <li>Per questo è previsto un archivio esterno: il primo di ogni mese un&apos;automazione salva il registro del mese precedente e l&apos;ultimo hash nel bucket protetto «archivio-audit». Finché non è passato il primo fine mese, l&apos;archivio è vuoto.</li>
+          <li>L&apos;indirizzo IP è un dato personale: lo vede solo il titolare. Fa parte della registrazione firmata, quindi resta conservato insieme al registro.</li>
+          <li>Questo registro non sostituisce la conservazione a norma delle fatture elettroniche.</li>
+        </ul>
+        <RegistroAudit iniziali={(registro ?? []) as VoceAudit[]} io={user.id} vedeIp={permessi.impostazioni} />
       </Sezione>
     </div>
   );

@@ -2,23 +2,24 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AlertTriangle, Check, FileText, RotateCw, UploadCloud, X } from "lucide-react";
+import { AlertTriangle, Check, FileText, RotateCw, Trash2, UploadCloud, X } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { cn } from "@/lib/format";
+import { controlloFile } from "@/lib/controlli";
 import { avviaElaborazione, prenotaCaricamento, riprovaDocumento, statoDocumenti, type StatoRemoto } from "./actions";
 
 const MAX_BYTE = 25 * 1024 * 1024;
 const ESTENSIONI = ["pdf", "xml", "jpg", "jpeg", "png", "webp"];
 const PASSI = ["Preparazione", "Caricamento", "In coda", "Estrazione", "Abbinamento", "Completato"] as const;
 
-type Fase = "preparazione" | "caricamento" | "in_coda" | "estrazione" | "abbinamento" | "completato" | "errore" | "duplicato";
+type Fase = "pronto" | "preparazione" | "caricamento" | "in_coda" | "estrazione" | "abbinamento" | "completato" | "errore" | "duplicato";
 type Voce = {
   chiave: string; nome: string; dimensione: number; fase: Fase; messaggio?: string;
   documentoId?: string; remoto?: StatoRemoto; riprovabile?: boolean;
 };
 
 const indicePasso = (f: Fase) =>
-  ({ preparazione: 0, caricamento: 1, in_coda: 2, estrazione: 3, abbinamento: 4, completato: 5, errore: -1, duplicato: -1 })[f];
+  ({ pronto: -1, preparazione: 0, caricamento: 1, in_coda: 2, estrazione: 3, abbinamento: 4, completato: 5, errore: -1, duplicato: -1 })[f];
 
 function faseDaRemoto(r: StatoRemoto): Fase {
   if (r.stato === "completato") return "completato";
@@ -53,6 +54,8 @@ export function Caricatore({ ristoranteId }: { ristoranteId: string }) {
   const [voci, setVoci] = useState<Voce[]>([]);
   const [sopra, setSopra] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const file = useRef(new Map<string, File>());
+  const [invio, setInvio] = useState(false);
   const vociRef = useRef(voci);
   vociRef.current = voci;
 
@@ -106,15 +109,41 @@ export function Caricatore({ ristoranteId }: { ristoranteId: string }) {
     }
   }, [aggiorna]);
 
-  const aggiungi = useCallback((lista: FileList | File[]) => {
-    const nuovi = Array.from(lista).slice(0, 20).map((f) => ({
-      voce: { chiave: crypto.randomUUID(), nome: f.name, dimensione: f.size, fase: "preparazione" as Fase }, file: f,
-    }));
-    if (!nuovi.length) return;
-    setVoci((v) => [...nuovi.map((n) => n.voce), ...v]);
-    // In sequenza: evita picchi di memoria con molte foto ad alta risoluzione.
-    (async () => { for (const n of nuovi) await elabora(n.voce.chiave, n.file); })();
-  }, [elabora]);
+  // I file scelti restano in attesa: si possono togliere prima dell'invio.
+  // Qui si scartano subito quelli che non potrebbero essere letti.
+  const aggiungi = useCallback(async (lista: FileList | File[]) => {
+    const nuovi: Voce[] = [];
+    for (const f of Array.from(lista).slice(0, 20)) {
+      const chiave = crypto.randomUUID();
+      const est = f.name.split(".").pop()?.toLowerCase() ?? "";
+      let problema: string | null = null;
+      if (!f.type.startsWith("image/") && !ESTENSIONI.includes(est) && est !== "p7m") problema = "Formato non supportato: usa PDF, XML, JPG, PNG o WEBP";
+      else if (f.size > 60 * 1024 * 1024 || (!f.type.startsWith("image/") && f.size > MAX_BYTE)) problema = "File troppo grande: il limite è 25 MB";
+      else {
+        const testa = new Uint8Array(await f.slice(0, 2048).arrayBuffer());
+        const coda = new Uint8Array(await f.slice(Math.max(0, f.size - 8192)).arrayBuffer());
+        const latino = (b: Uint8Array) => Array.from(b, (c) => String.fromCharCode(c)).join("");
+        problema = controlloFile(f.name, testa, latino(testa) + latino(coda));
+      }
+      if (!problema) file.current.set(chiave, f);
+      nuovi.push({ chiave, nome: f.name, dimensione: f.size, fase: problema ? "errore" : "pronto", messaggio: problema ?? undefined });
+    }
+    if (nuovi.length) setVoci((v) => [...nuovi, ...v]);
+  }, []);
+
+  // In sequenza: evita picchi di memoria con molte foto ad alta risoluzione.
+  const invia = useCallback(async () => {
+    setInvio(true);
+    const pronti = vociRef.current.filter((v) => v.fase === "pronto").reverse();
+    for (const v of pronti) {
+      const f = file.current.get(v.chiave);
+      if (!f) continue;
+      aggiorna(v.chiave, { fase: "preparazione" });
+      await elabora(v.chiave, f);
+      file.current.delete(v.chiave);
+    }
+    setInvio(false);
+  }, [aggiorna, elabora]);
 
   // Stato in tempo reale (Realtime) con controllo periodico di riserva.
   useEffect(() => {
@@ -155,11 +184,22 @@ export function Caricatore({ ristoranteId }: { ristoranteId: string }) {
           <UploadCloud className="size-5" />
         </span>
         <p className="mt-4 text-sm font-medium">Trascina qui fatture e DDT, oppure scegli i file</p>
-        <p className="mt-1 text-xs text-muted">PDF, XML FatturaPA o foto · fino a 25 MB per file · italiano, francese, tedesco, inglese</p>
+        <p className="mt-1 text-xs text-muted">PDF (anche di più pagine), XML FatturaPA o foto · fino a 25 MB per file · un solo documento per file</p>
         <input ref={input} type="file" multiple hidden
-          accept=".pdf,.xml,.jpg,.jpeg,.png,.webp,application/pdf,application/xml,text/xml,image/*"
+          accept=".pdf,.xml,.p7m,.jpg,.jpeg,.png,.webp,application/pdf,application/xml,text/xml,image/*"
           onChange={(e) => { if (e.target.files) aggiungi(e.target.files); e.target.value = ""; }} />
       </div>
+
+      {voci.some((v) => v.fase === "pronto") && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-raised px-3 py-2.5">
+          <p className="text-[13px] text-muted">
+            <span className="num text-fg">{voci.filter((v) => v.fase === "pronto").length}</span> pronti per l&apos;invio. Controlla l&apos;elenco e togli ciò che non serve.
+          </p>
+          <button type="button" disabled={invio} onClick={invia} className="btn btn-primary">
+            <UploadCloud className="size-3.5" />{invio ? "Invio in corso…" : `Carica ${voci.filter((v) => v.fase === "pronto").length === 1 ? "il documento" : "i documenti"}`}
+          </button>
+        </div>
+      )}
 
       <ul className="space-y-2" aria-live="polite">
         <AnimatePresence initial={false}>
@@ -168,6 +208,7 @@ export function Caricatore({ ristoranteId }: { ristoranteId: string }) {
             const errore = v.fase === "errore";
             const doppio = v.fase === "duplicato";
             const fatto = v.fase === "completato";
+            const pronto = v.fase === "pronto";
             return (
               <motion.li key={v.chiave} layout
                 initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }}
@@ -192,11 +233,12 @@ export function Caricatore({ ristoranteId }: { ristoranteId: string }) {
                         : fatto ? (v.remoto?.n_anomalie
                             ? <span className="text-danger">{v.remoto.n_anomalie} {v.remoto.n_anomalie === 1 ? "rincaro rilevato" : "rincari rilevati"}</span>
                             : "Acquisito · prezzi nella norma")
+                        : pronto ? "Pronto per l'invio"
                         : v.fase === "estrazione" ? "Lettura del documento con l'IA…"
                         : v.fase === "abbinamento" ? "Abbinamento degli articoli al catalogo…"
                         : `${PASSI[passo]}…`}
                     </p>
-                    {!errore && !doppio && (
+                    {!errore && !doppio && !pronto && (
                       <div className="mt-3 flex gap-1" aria-hidden>
                         {PASSI.map((nome, i) => (
                           <div key={nome} className="h-1 flex-1 overflow-hidden rounded-full bg-line">
@@ -214,9 +256,11 @@ export function Caricatore({ ristoranteId }: { ristoranteId: string }) {
                     {v.documentoId && (fatto || doppio) && (
                       <Link href={`/documenti/${doppio ? (v.remoto?.duplicato_di ?? v.documentoId) : v.documentoId}`} className="btn btn-sm">Apri</Link>
                     )}
-                    {(errore || doppio || fatto) && (
-                      <button type="button" aria-label="Rimuovi dall'elenco" className="btn btn-ghost btn-sm px-1.5"
-                        onClick={() => setVoci((x) => x.filter((y) => y.chiave !== v.chiave))}><X className="size-3.5" /></button>
+                    {(errore || doppio || fatto || pronto) && (
+                      <button type="button" aria-label={pronto ? `Togli ${v.nome} prima dell'invio` : `Rimuovi ${v.nome} dall'elenco`} className="btn btn-ghost btn-sm px-1.5"
+                        onClick={() => { file.current.delete(v.chiave); setVoci((x) => x.filter((y) => y.chiave !== v.chiave)); }}>
+                        {pronto ? <Trash2 className="size-3.5" /> : <X className="size-3.5" />}
+                      </button>
                     )}
                   </div>
                 </div>

@@ -12,10 +12,13 @@ REGOLE RIGIDE
 9. descrizione_originale è il testo esatto del documento. descrizione_articolo è il nome in italiano, pulito e specifico: conserva taglio, razza, varietà, origine, denominazione (DOP/IGP/AOC), stagionatura, annata e formato della confezione; elimina codici interni, lotti e date di scadenza. Esempio: "Filet de bœuf Charolais VBF" → "Filetto di manzo Charolais".
 10. peso_netto_kg: peso netto TOTALE della riga in kg, solo se il documento lo riporta e l'unità di vendita non è già il peso (esempio: 2 pz, peso 2,4 kg → 2.4). Altrimenti null.
 11. contenuto_per_unita e unita_contenuto: quando l'articolo è venduto a pezzo o confezione e il documento ne indica il contenuto, riporta quanto contiene UNA unità di vendita, in kg, lt o pz. Esempi: "cartone 6 × 1 L" → 6 e "lt"; "bottiglia 75 cl" → 0.75 e "lt"; "vaschetta 500 g" → 0.5 e "kg"; "cassa 12 pz" → 12 e "pz". Altrimenti null.
+12. Se il file contiene più documenti distinti (per esempio due fatture), estrai SOLO il primo e indica quanti sono in qualita.documenti_nel_file.
+13. qualita.leggibilita: "buona", "media" o "scarsa". Se non è buona, spiega il motivo in qualita.note in poche parole (per esempio: foto inclinata, foto di uno schermo, parti tagliate, cifre coperte da timbri). Non compensare una lettura incerta inventando valori: usa null.
 
 STRUTTURA
 {"documento":{"tipo":"Fattura|DDT|Nota di Credito|Altro","numero_documento":null,"data_documento":null,"codice_valuta":"EUR"},
 "fornitore":{"ragione_sociale":"","partita_iva_o_estera":null,"paese":"IT","codice_identificativo_estero":null},
 "cliente":{"ragione_sociale":null,"partita_iva":null},
 "totali":{"imponibile":0,"iva":0,"totale_documento":0,"valuta":"EUR"},
+"qualita":{"leggibilita":"buona","note":null,"documenti_nel_file":1},
 "articoli":[{"codice_articolo_fornitore":null,"descrizione_originale":"","descrizione_articolo":"","quantita":0,"unita_misura":"kg","prezzo_unitario":0,"sconto_percentuale":null,"totale_riga":0,"aliquota_iva_percentuale":null,"peso_netto_kg":null,"contenuto_per_unita":null,"unita_contenuto":null}]}

@@ -53,7 +53,14 @@ const articoli = (data.articoli || []).map(a => {
   };
 }).filter(a => a.descrizione_articolo && a.prezzo_unitario !== null);
 
+const q = data.qualita || {};
+const qualita = {
+  leggibilita: ['buona', 'media', 'scarsa'].includes(q.leggibilita) ? q.leggibilita : null,
+  note: q.note ? String(q.note).slice(0, 200) : null,
+  documenti_nel_file: Number.isInteger(q.documenti_nel_file) && q.documenti_nel_file > 0 ? q.documenti_nel_file : null
+};
+
 return [{ json: {
   p_documento_id: $('Avvia elaborazione').first().json.documento_id,
-  payload: { documento: doc, fornitore: forn, cliente: data.cliente || {}, totali: tot, articoli }
+  payload: { documento: doc, fornitore: forn, cliente: data.cliente || {}, totali: tot, qualita, articoli }
 } }];

@@ -1,9 +1,10 @@
 "use client";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Check, GitMerge, Sparkles, X } from "lucide-react";
-import { cn, money, num } from "@/lib/format";
+import { cn, data as dataFmt, money, num } from "@/lib/format";
 import { UNITA_BASE, type Esito, type Master } from "@/lib/tipi";
 import { Badge, Paese, Vuoto } from "@/components/ui";
 import { approvaMaster, confermaAbbinamento, creaMasterEConferma, rifiutaProposta, unisciMaster } from "./actions";
@@ -13,6 +14,7 @@ export type AliasInCoda = {
   unita_misura: string | null; stato_abbinamento: "da_abbinare" | "proposto"; confidenza: number | null;
   motivazione: string | null; master_proposto_id: string | null; fattore_proposto: number | null;
   ragione_sociale: string; paese: string | null; quantita: number | null; prezzo_unitario: number | null; valuta: string;
+  documento_id: string; data_rilevazione: string;
 };
 export type Bozza = Master & { esempi: string[] };
 
@@ -29,7 +31,8 @@ function SchedaAlias({ a, master, categorie, puo, fatto }: {
 }) {
   const [scelta, setScelta] = useState(a.master_proposto_id ?? (master.length ? "" : NUOVO));
   const [nome, setNome] = useState(a.descrizione_normalizzata);
-  const [categoria, setCategoria] = useState(categorie[0] ?? "");
+  // Nessuna categoria predefinita: va scelta, altrimenti finirebbe sulla prima in ordine alfabetico.
+  const [categoria, setCategoria] = useState("");
   const [unita, setUnita] = useState<string>(["kg", "lt", "pz"].includes(a.unita_misura ?? "") ? a.unita_misura! : "kg");
   const [fattore, setFattore] = useState(a.fattore_proposto ? String(a.fattore_proposto).replace(".", ",") : "");
   const [errore, setErrore] = useState<string | null>(null);
@@ -48,6 +51,7 @@ function SchedaAlias({ a, master, categorie, puo, fatto }: {
   const conferma = () => {
     if (scelta === NUOVO) {
       if (!nome.trim()) return setErrore("Indica il nome dell'articolo");
+      if (!categoria) return setErrore("Scegli la categoria del nuovo articolo");
       return esegui(() => creaMasterEConferma(a.id, { nome, categoria, unita }, leggiFattore(fattore)));
     }
     if (!scelta) return setErrore("Scegli un articolo del catalogo");
@@ -68,7 +72,9 @@ function SchedaAlias({ a, master, categorie, puo, fatto }: {
         <p className="num mt-1.5 text-xs text-muted">
           {a.codice_articolo && <>cod. {a.codice_articolo} · </>}
           {num(a.quantita, 3)} {a.unita_misura} × {money(a.prezzo_unitario, a.valuta)}
+          {" · "}<Link href={`/documenti/${a.documento_id}`} className="underline hover:text-fg">documento del {dataFmt(a.data_rilevazione)}</Link>
         </p>
+        {a.stato_abbinamento === "proposto" && a.confidenza != null && a.confidenza < 0.7 && <p className="mt-1.5 text-xs text-warn">Confidenza bassa: verifica con attenzione.</p>}
         {a.motivazione && a.stato_abbinamento === "proposto" && <p className="mt-2 border-l-2 border-line pl-2.5 text-xs text-muted">{a.motivazione}</p>}
       </div>
 
@@ -84,12 +90,14 @@ function SchedaAlias({ a, master, categorie, puo, fatto }: {
         {scelta === NUOVO && (
           <div className="grid grid-cols-[1fr_auto] gap-2">
             <input className="input col-span-2" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome standard" aria-label="Nome del nuovo articolo" />
-            <select className="input" value={categoria} onChange={(e) => setCategoria(e.target.value)} aria-label="Categoria">
+            <select className="input" value={categoria} onChange={(e) => setCategoria(e.target.value)} aria-label="Categoria" required>
+              <option value="" disabled>Categoria…</option>
               {categorie.map((c) => <option key={c}>{c}</option>)}
             </select>
             <select className="input w-20" value={unita} onChange={(e) => setUnita(e.target.value)} aria-label="Unità base">
               {UNITA_BASE.map((u) => <option key={u}>{u}</option>)}
             </select>
+            <p className="col-span-2 text-[11px] text-subtle">Usa un nome generico, senza formato della confezione: «tanica 5 lt» e «bottiglia 0,75» sono lo stesso articolo.</p>
           </div>
         )}
         {serveFattore && (
@@ -150,15 +158,16 @@ function SchedaBozza({ b, altri, categorie, puo, fatto }: { b: Bozza; altri: Mas
             {altri.length > 0 && (
               <>
                 <span className="text-xs text-subtle">oppure</span>
-                <select className="input w-44" value={verso} onChange={(e) => setVerso(e.target.value)} aria-label="Unisci in un altro articolo">
-                  <option value="">È un doppione di…</option>
+                <select className="input w-52" value={verso} onChange={(e) => setVerso(e.target.value)} aria-label="Articolo di destinazione in cui unire questa bozza">
+                  <option value="">Scegli l&apos;articolo di destinazione…</option>
                   {altri.map((m) => <option key={m.id} value={m.id}>{m.nome}</option>)}
                 </select>
-                <button disabled={inCorso || !verso} onClick={() => esegui(() => unisciMaster(b.id, verso))} className="btn"><GitMerge className="size-3.5" />Unisci</button>
+                <button disabled={inCorso || !verso} title={verso ? undefined : "Scegli prima l'articolo di destinazione"} onClick={() => esegui(() => unisciMaster(b.id, verso))} className="btn"><GitMerge className="size-3.5" />Unisci</button>
               </>
             )}
           </div>
         ) : <p className="text-xs text-subtle">Solo il titolare può approvare i nuovi articoli del catalogo.</p>}
+        {puo && verso && <p className="text-[11px] text-warn">Unendo, descrizioni e storico prezzi di «{b.nome}» passano a «{altri.find((m) => m.id === verso)?.nome}» e i confronti vengono ricalcolati. La bozza viene eliminata: non si può annullare.</p>}
       </div>
     </div>
   );
@@ -170,7 +179,9 @@ export function Coda({ alias, bozze, master, categorie, permessi }: {
   const router = useRouter();
   const [nascosti, setNascosti] = useState<Set<string>>(new Set());
   const fatto = (id: string) => { setNascosti((s) => new Set(s).add(id)); router.refresh(); };
-  const vAlias = alias.filter((a) => !nascosti.has(a.id));
+  // Prima i casi più incerti: senza proposta, poi per confidenza crescente.
+  const vAlias = alias.filter((a) => !nascosti.has(a.id))
+    .sort((x, y) => (x.confidenza ?? -1) - (y.confidenza ?? -1));
   const vBozze = bozze.filter((b) => !nascosti.has(b.id));
 
   if (!vAlias.length && !vBozze.length) {
@@ -182,7 +193,7 @@ export function Coda({ alias, bozze, master, categorie, permessi }: {
       {vAlias.length > 0 && (
         <section>
           <h2 className="text-[13px] font-medium">Abbinamenti da confermare <span className="num text-subtle">· {vAlias.length}</span></h2>
-          <p className="mt-0.5 text-xs text-muted">Ogni conferma viene ricordata: la prossima volta lo stesso articolo dello stesso fornitore si abbina da solo.</p>
+          <p className="mt-0.5 text-xs text-muted">In ordine di incertezza. Confermando, la descrizione del fornitore resta collegata all&apos;articolo: i prossimi documenti si abbinano da soli e i prezzi vengono confrontati con lo storico di quell&apos;articolo. Dal catalogo il titolare può revocare.</p>
           <ul className="mt-3">
             <AnimatePresence initial={false}>
               {vAlias.map((a) => (
@@ -197,7 +208,7 @@ export function Coda({ alias, bozze, master, categorie, permessi }: {
       {vBozze.length > 0 && (
         <section>
           <h2 className="text-[13px] font-medium">Nuovi articoli del catalogo <span className="num text-subtle">· {vBozze.length}</span></h2>
-          <p className="mt-0.5 text-xs text-muted">Creati dall&apos;IA per prodotti mai visti. Controlla nome, categoria e unità base: valgono per tutte le sedi del gruppo.</p>
+          <p className="mt-0.5 text-xs text-muted">Creati dall&apos;IA per prodotti mai visti. Controlla nome, categoria e unità base: valgono per tutte le sedi del gruppo. L&apos;unità base decide come si confrontano i prezzi (un articolo a kg comprato a pezzi richiede il peso). Approvando, l&apos;articolo diventa definitivo; si può correggere in seguito dal catalogo.</p>
           <ul className="mt-3">
             <AnimatePresence initial={false}>
               {vBozze.map((b) => (

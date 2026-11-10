@@ -14,7 +14,7 @@ export const sessione = cache(async () => {
 
   const [{ data: ristoranti }, { data: mr }, { data: mg }] = await Promise.all([
     supabase.from("ristoranti")
-      .select("id,nome,paese,valuta,partita_iva,soglia_anomalia_pct,gruppo_id,gruppi(id,nome)")
+      .select("id,nome,paese,valuta,partita_iva,soglia_anomalia_pct,soglia_anomalia_min_eur,gruppo_id,gruppi(id,nome)")
       .order("nome").returns<Ristorante[]>(),
     supabase.from("membri_ristorante").select("ristorante_id,ruolo").eq("user_id", user.id)
       .returns<{ ristorante_id: string; ruolo: Ruolo }[]>(),
@@ -54,8 +54,11 @@ export async function sessioneSede() {
   return { ...s, attivo: s.attivo, ruolo: s.ruolo };
 }
 
-export const cruscotto = cache(async (ristoranteId: string): Promise<Cruscotto | null> => {
+export const PERIODI = [30, 90, 365] as const;
+
+/** Indicatori della sede per un periodo (giorni fino a oggi, per data documento). */
+export const cruscotto = cache(async (ristoranteId: string, giorni: number = 90): Promise<Cruscotto | null> => {
   const { supabase } = await sessione();
-  const { data } = await supabase.rpc("cruscotto", { p_ristorante_id: ristoranteId });
+  const { data } = await supabase.rpc("cruscotto", { p_ristorante_id: ristoranteId, p_giorni: giorni });
   return (data as Cruscotto) ?? null;
 });

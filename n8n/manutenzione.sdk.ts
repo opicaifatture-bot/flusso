@@ -20,8 +20,8 @@ const scaricaTassi = node({
     name: 'Scarica tassi BCE',
     parameters: {
       method: 'GET',
-      url: 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml',
-      options: { response: { response: { responseFormat: 'text', outputPropertyName: 'data' } }, timeout: 30000 }
+      url: 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml',
+      options: { response: { response: { responseFormat: 'text', outputPropertyName: 'data' } }, timeout: 60000 }
     }
   },
   output: [{ data: '<Cube time="2026-11-06"><Cube currency="CHF" rate="0.9312"/></Cube>' }]
@@ -35,15 +35,20 @@ const leggiTassi = node({
     parameters: {
       mode: 'runOnceForAllItems',
       language: 'javaScript',
-      jsCode: `// Estrae i tassi di riferimento BCE (unità di valuta per 1 EUR) degli ultimi 90 giorni.
+      jsCode: `// Estrae i tassi di riferimento BCE (unità di valuta per 1 EUR) dallo storico completo.
+// Si tengono gli ultimi tre anni per le valute usate dai fornitori: così anche un
+// documento caricato in ritardo trova il cambio della propria data.
+const VALUTE = ['CHF', 'USD', 'GBP'];
+const dal = new Date(Date.now() - 3 * 365 * 86400000).toISOString().slice(0, 10);
 const xml = String($input.first().json.data || '');
 const tassi = [];
 const giorni = xml.split('<Cube time="').slice(1);
 for (const g of giorni) {
   const data = g.slice(0, 10);
+  if (data < dal) continue;
   const re = /currency="([A-Z]{3})"\\s+rate="([0-9.]+)"/g;
   let m;
-  while ((m = re.exec(g)) !== null) tassi.push({ data, valuta: m[1], tasso: Number(m[2]) });
+  while ((m = re.exec(g)) !== null) if (VALUTE.includes(m[1])) tassi.push({ data, valuta: m[1], tasso: Number(m[2]) });
 }
 if (!tassi.length) throw new Error('Nessun tasso trovato nella risposta della BCE');
 return [{ json: { p_tassi: tassi, n: tassi.length } }];`
