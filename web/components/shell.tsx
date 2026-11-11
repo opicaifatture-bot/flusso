@@ -2,9 +2,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { BookOpen, ChefHat, ChevronsUpDown, FileText, LayoutDashboard, ListChecks, LogOut, Menu, Moon, Package, Settings, Sun, Thermometer, TrendingUp, Truck, Upload, Wine, Wrench } from "lucide-react";
+import { BookOpen, ChefHat, ClipboardCheck, ChevronsUpDown, FileText, LayoutDashboard, ListChecks, LogOut, Menu, Moon, Package, Settings, Sun, Thermometer, TrendingUp, Truck, Upload, Wine, Wrench } from "lucide-react";
 import { cn } from "@/lib/format";
 import { RUOLI, type Ruolo } from "@/lib/tipi";
+import { limitato } from "@/lib/aree";
 import { cambiaSede } from "@/app/(app)/azioni";
 import { esci } from "@/app/login/actions";
 
@@ -33,7 +34,19 @@ const OPERATIVE: Voce[] = [
   { href: "/cantina", etichetta: "Cantina", icona: Wine, funzione: "cantina" },
   { href: "/manutenzione", etichetta: "Manutenzione", icona: Wrench, funzione: "manutenzione" },
 ];
+const AUTOCONTROLLO: Voce[] = [
+  { href: "/autocontrollo", etichetta: "Autocontrollo", icona: ClipboardCheck, funzione: "autocontrollo" },
+];
 const FINALI: Voce[] = [{ href: "/impostazioni", etichetta: "Impostazioni", icona: Settings }];
+
+/** Gruppi del menu per ruolo: consulente e cucina vedono solo l'autocontrollo e le celle. */
+function gruppi(ruolo: Ruolo | null): { titolo: string | null; voci: Voce[] }[] {
+  if (limitato(ruolo)) {
+    const voci = [...AUTOCONTROLLO, OPERATIVE[0], ...(ruolo === "consulente" ? [OPERATIVE[5]] : [])];
+    return [{ titolo: "Autocontrollo", voci }];
+  }
+  return [{ titolo: "Acquisti", voci: VOCI }, { titolo: "Operations", voci: OPERATIVE }, { titolo: "Sicurezza alimentare", voci: AUTOCONTROLLO }, { titolo: null, voci: FINALI }];
+}
 
 function Logo() {
   return (
@@ -96,7 +109,7 @@ export function Shell({ email, ruolo, sedi, attiva, gruppo, conteggi, funzioni, 
         <div className="flex h-14 items-center px-4"><Logo /></div>
         <div className="px-3"><SelettoreSede sedi={sedi} attiva={attiva} gruppo={gruppo} /></div>
         <nav className="mt-4 flex-1 overflow-y-auto px-3 pb-3" aria-label="Navigazione principale">
-          {[{ titolo: "Acquisti", voci: VOCI }, { titolo: "Operations", voci: OPERATIVE }, { titolo: null, voci: FINALI }].map((g, gi) => (
+          {gruppi(ruolo).map((g, gi) => (
             <div key={gi} className={gi ? "mt-4" : ""}>
               {g.titolo && <p className="eyebrow mb-1 px-2.5">{g.titolo}</p>}
               <div className="space-y-0.5">
@@ -147,8 +160,8 @@ export function Shell({ email, ruolo, sedi, attiva, gruppo, conteggi, funzioni, 
       </main>
 
       {/* Barra inferiore (mobile) */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label="Navigazione principale">
-        {[VOCI[0], VOCI[1], OPERATIVE[0], OPERATIVE[1], { href: "/menu", etichetta: "Menu", icona: Menu } as Voce].map((v) => {
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid auto-cols-fr grid-flow-col border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label="Navigazione principale">
+        {(limitato(ruolo) ? gruppi(ruolo)[0].voci : [VOCI[0], VOCI[1], OPERATIVE[0], OPERATIVE[1]]).concat({ href: "/menu", etichetta: "Menu", icona: Menu } as Voce).map((v) => {
           const n = v.chiave ? conteggi[v.chiave] : v.href === "/menu" ? conteggi.validazione + conteggi.rincari : 0;
           return (
             <Link key={v.href} href={v.href} aria-current={attivo(v.href) ? "page" : undefined}
@@ -165,12 +178,12 @@ export function Shell({ email, ruolo, sedi, attiva, gruppo, conteggi, funzioni, 
 }
 
 /** Elenco completo delle sezioni, per gli schermi piccoli. */
-export function MenuCompleto({ funzioni }: { funzioni: string[] }) {
+export function MenuCompleto({ funzioni, ruolo }: { funzioni: string[]; ruolo: Ruolo | null }) {
   return (
     <div className="space-y-6">
-      {[{ titolo: "Acquisti", voci: VOCI }, { titolo: "Operations", voci: OPERATIVE }, { titolo: "Altro", voci: FINALI }].map((g) => (
-        <section key={g.titolo}>
-          <h2 className="eyebrow mb-2">{g.titolo}</h2>
+      {gruppi(ruolo).map((g) => (
+        <section key={g.titolo ?? "altro"}>
+          <h2 className="eyebrow mb-2">{g.titolo ?? "Altro"}</h2>
           <ul className="card divide-y divide-line">
             {g.voci.map((v) => (
               <li key={v.href}><Link href={v.href} className="flex items-center gap-3 px-4 py-3 text-sm">

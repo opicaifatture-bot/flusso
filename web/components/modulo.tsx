@@ -124,7 +124,10 @@ export function Azione({ rpc, parametri, etichetta, conferma, motivo, stile = "b
       const testo = window.prompt(motivo.domanda);
       if (testo === null) return;
       if (!testo.trim() && !motivo.facoltativo) return setEsito({ ok: false, testo: "Il motivo è obbligatorio" });
-      extra[motivo.parametro] = testo.trim() || null;
+      // "p_dati.campo" inserisce il motivo dentro un parametro jsonb già presente.
+      const [par, campo] = motivo.parametro.split(".");
+      if (campo) extra[par] = { ...(parametri[par] as Record<string, unknown>), [campo]: testo.trim() || null };
+      else extra[par] = testo.trim() || null;
     }
     if (conferma && !window.confirm(conferma)) return;
     avvia(async () => {

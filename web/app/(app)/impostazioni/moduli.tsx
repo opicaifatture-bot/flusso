@@ -93,23 +93,27 @@ export function ModuloTeam({ membri, io }: { membri: { user_id: string; email: s
       </form>
       <div className="mt-2"><Messaggio esito={esito} ok="Team aggiornato" /></div>
       <div className="mt-4 overflow-x-auto rounded-lg border border-line">
-        <table className="w-full min-w-[520px] text-xs">
+        <table className="w-full min-w-[720px] text-xs">
           <caption className="sr-only">Cosa può fare ogni ruolo</caption>
-          <thead><tr><th scope="col" className="th">Azione</th>{["Titolare", "Chef", "Contabile", "Sola lettura"].map((r) => <th key={r} scope="col" className="th text-center">{r}</th>)}</tr></thead>
+          <thead><tr><th scope="col" className="th">Azione</th>{["Titolare", "Chef", "Contabile", "Sola lettura", "Consulente HACCP", "Cucina (tablet)"].map((r) => <th key={r} scope="col" className="th text-center">{r}</th>)}</tr></thead>
           <tbody>
             {([
-              ["Consultare documenti, prezzi e catalogo della sede", 1, 1, 1, 1],
-              ["Caricare documenti, correggere le righe, contestare un rincaro", 1, 1, 1, 0],
-              ["Correggere numero, data, valuta e totali del documento", 1, 0, 1, 0],
-              ["Validare gli abbinamenti al catalogo", 1, 1, 0, 0],
-              ["Approvare rincari e articoli master, unire, scollegare", 1, 0, 0, 0],
-              ["Registrare letture, lotti, movimenti, ricette, interventi", 1, 1, 0, 0],
-              ["Registrare vendite, consegne e non conformità", 1, 1, 1, 0],
-              ["Soglie delle celle, sensori, trasferimenti tra sedi, approvare ordini", 1, 0, 0, 0],
-              ["Impostazioni della sede, inviti e team", 1, 0, 0, 0],
-              ["Consultare e verificare il registro di audit", 1, 0, 1, 0],
-              ["Vedere gli indirizzi IP nel registro", 1, 0, 0, 0],
-            ] as [string, number, number, number, number][]).map(([azione, ...p]) => (
+              ["Consultare documenti d'acquisto, prezzi, magazzino e ricette", 1, 1, 1, 1, 0, 0],
+              ["Caricare fatture, correggere le righe, contestare un rincaro", 1, 1, 1, 0, 0, 0],
+              ["Correggere numero, data, valuta e totali del documento", 1, 0, 1, 0, 0, 0],
+              ["Validare gli abbinamenti al catalogo", 1, 1, 0, 0, 0, 0],
+              ["Approvare rincari e articoli master, unire, scollegare", 1, 0, 0, 0, 0, 0],
+              ["Registrare letture, lotti, movimenti, ricette, interventi", 1, 1, 0, 0, 0, 0],
+              ["Registrare vendite, consegne e non conformità", 1, 1, 1, 0, 0, 0],
+              ["Soglie delle celle, sensori, trasferimenti tra sedi, approvare ordini", 1, 0, 0, 0, 0, 0],
+              ["Consultare l'autocontrollo: celle, manutenzione, documenti HACCP, persone", 1, 1, 0, 1, 1, 1],
+              ["Archiviare documenti HACCP e gestire l'elenco delle persone", 1, 1, 0, 0, 1, 0],
+              ["Impostare i PIN delle persone", 1, 1, 0, 0, 0, 0],
+              ["Firmare con il PIN personale sul tablet", 1, 1, 0, 0, 0, 1],
+              ["Impostazioni della sede, inviti e team", 1, 0, 0, 0, 0, 0],
+              ["Consultare e verificare il registro di audit", 1, 0, 1, 0, 0, 0],
+              ["Vedere gli indirizzi IP nel registro", 1, 0, 0, 0, 0, 0],
+            ] as [string, ...number[]][]).map(([azione, ...p]) => (
               <tr key={azione} className="riga"><th scope="row" className="td text-left font-normal text-muted">{azione}</th>
                 {p.map((x, i) => <td key={i} className="td text-center">{x ? <span className="text-ok" aria-label="sì">✓</span> : <span className="text-subtle" aria-label="no">—</span>}</td>)}</tr>
             ))}

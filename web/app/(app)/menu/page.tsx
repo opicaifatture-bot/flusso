@@ -6,7 +6,7 @@ import { MenuCompleto } from "@/components/shell";
 export const metadata: Metadata = { title: "Menu" };
 
 export default async function PaginaMenu() {
-  const { attivo } = await sessioneSede();
+  const { attivo, ruolo } = await sessioneSede();
   const piano = await pianoCorrente(attivo.gruppo_id);
-  return <div className="mx-auto max-w-xl"><Intestazione titolo="Tutte le sezioni" sottotitolo={attivo.nome} /><MenuCompleto funzioni={piano?.funzioni ?? []} /></div>;
+  return <div className="mx-auto max-w-xl"><Intestazione titolo="Tutte le sezioni" sottotitolo={attivo.nome} /><MenuCompleto funzioni={piano?.funzioni ?? []} ruolo={ruolo} /></div>;
 }

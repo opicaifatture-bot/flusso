@@ -124,3 +124,32 @@ di autocontrollo. I registri prodotti sono un supporto, non un sostituto della d
 `supabase/tests/esegui.sh` (PostgreSQL locale): 271 asserzioni su piani, ruoli, inviti, isolamento tra sedi e
 gruppi, immutabilità, storni, FEFO/FIFO, conversioni, allarmi, costi, scorecard, catena di audit.
 `npm test` in `web/`: 10 test su controlli, numeri e stati di pagamento. Dati esclusivamente fittizi.
+
+## Autocontrollo HACCP — blocco 1
+
+Migrazioni `20261113090000_ruoli_consulente_cucina.sql` e `20261113091000_autocontrollo_base.sql`.
+
+**Ruoli nuovi**
+- *Consulente HACCP*: vede e gestisce solo autocontrollo, celle e manutenzione. Non vede fatture, prezzi, magazzino, ricette.
+- *Cucina (tablet)*: account condiviso. Vede autocontrollo e celle; chi registra si identifica con il proprio PIN.
+- Il contabile resta escluso dall'autocontrollo. Per i ruoli esistenti non cambia nulla.
+Tecnicamente `app.ha_accesso_ristorante` / `app.ha_accesso_gruppo` escludono i due ruoli nuovi; le tabelle
+dell'autocontrollo usano `app.vede_autocontrollo`.
+
+**Persone e PIN**: dipendenti anche senza account (`persone`). PIN di 4–8 cifre, non banale, salvato solo come
+hash in `persone_pin` (nessun privilegio per i ruoli API, nessun audit). Cinque errori consecutivi bloccano la
+persona per 15 minuti; l'errore non solleva eccezioni, così il conteggio dei tentativi viene salvato. Le persone
+non si cancellano, si disattivano.
+
+**Archivio documenti**: bucket privato `archivio`, percorso `{sede}/{uuid}.{ext}`. Ogni revisione è una nuova
+versione con SHA-256; versioni e documenti non si modificano né si cancellano (si archiviano con motivo).
+
+**Scadenzario**: `v_scadenzario` unisce scadenze dei documenti e piani di manutenzione.
+
+**Conservazione**: `gruppi.conservazione_anni`, minimo 2 (indicazione del consulente HACCP del titolare).
+
+**Fonti ricevute**: albero delle decisioni del consulente (ALL.AD rev. 00, le quattro domande del Codex) e
+tabella dei 14 allergeni. Saranno la base della procedura guidata CCP e della matrice allergeni.
+
+**Formazione regionale**: le delibere originali non erano raggiungibili; i dati raccolti da fonti secondarie
+saranno inseriti come regole «da verificare», da confermare sul testo ufficiale.

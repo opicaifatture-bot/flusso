@@ -1,4 +1,4 @@
-export type Ruolo = "titolare" | "chef" | "contabile" | "sola_lettura";
+export type Ruolo = "titolare" | "chef" | "contabile" | "sola_lettura" | "consulente" | "cucina";
 export type StatoDocumento = "in_coda" | "elaborazione" | "completato" | "errore" | "duplicato";
 export type StatoAnomalia = "aperta" | "accettata" | "contestata";
 export type Esito<T = undefined> = { ok: true; dati?: T } | { ok: false; errore: string };
@@ -8,6 +8,8 @@ export const RUOLI: Record<Ruolo, string> = {
   chef: "Chef",
   contabile: "Contabile",
   sola_lettura: "Sola lettura",
+  consulente: "Consulente HACCP",
+  cucina: "Cucina (tablet)",
 };
 export const UNITA_BASE = ["kg", "lt", "pz", "conf", "mt"] as const;
 export const UNITA = ["kg", "g", "lt", "cl", "ml", "pz", "conf", "mt"] as const;
