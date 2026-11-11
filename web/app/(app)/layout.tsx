@@ -2,14 +2,14 @@ import { cruscotto, pianoCorrente, sessione } from "@/lib/sessione";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Shell } from "@/components/shell";
-import { HOME_LIMITATA, limitato, percorsoConsentito } from "@/lib/aree";
+import { homeLimitata, limitato, percorsoConsentito } from "@/lib/aree";
 
 export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { supabase, user, sedi, attivo, ruolo } = await sessione();
   const percorso = (await headers()).get("x-percorso") ?? "/";
-  if (!percorsoConsentito(ruolo, percorso)) redirect(HOME_LIMITATA);
+  if (!percorsoConsentito(ruolo, percorso)) redirect(homeLimitata(ruolo));
   const [k, piano, allarmi] = attivo ? await Promise.all([
     limitato(ruolo) ? Promise.resolve(null) : cruscotto(attivo.id, 90), pianoCorrente(attivo.gruppo_id),
     supabase.from("allarmi").select("id", { count: "exact", head: true }).eq("ristorante_id", attivo.id).neq("stato", "risolto"),

@@ -153,3 +153,30 @@ tabella dei 14 allergeni. Saranno la base della procedura guidata CCP e della ma
 
 **Formazione regionale**: le delibere originali non erano raggiungibili; i dati raccolti da fonti secondarie
 saranno inseriti come regole «da verificare», da confermare sul testo ufficiale.
+
+## Autocontrollo HACCP — blocchi 2–7
+
+Migrazione `20261113092000_autocontrollo_completo.sql`; flusso n8n `n8n/estrazione.sdk.ts`
+(«Kitchen OS: lettura manuale HACCP e piano analisi», webhook `price-guardian/estrazione`, stesso token dei documenti).
+
+- **Piano HACCP** (`controlli`): CCP, pulizie, infestanti, analisi acqua/alimenti, abbattimento, conservazione,
+  ricevimento. Ogni controllo ha la fonte: «manuale» (da proposta approvata) o «utente». Modificare un controllo
+  del manuale richiede un motivo ed è segnalato come «diverso dal manuale».
+- **Estrazione**: l'app chiede a n8n di leggere un documento dell'archivio con un link firmato valido un'ora;
+  Claude restituisce proposte con pagina e citazione; n8n le salva con `registra_proposte` (solo ruolo di servizio).
+  Nulla viene applicato: titolare o consulente scelgono «come da manuale», «imposta manualmente» (con motivo) o «scarta».
+- **Albero delle decisioni**: le 4 domande del documento ALL.AD del consulente, rev. 00 (`app.esito_albero`).
+- **Registri** (`registrazioni`): immutabili, firmati con PIN (obbligatorio con l'account Cucina), esito automatico
+  dai limiti, azione correttiva obbligatoria se non conforme, rettifiche motivate che non cancellano l'originale.
+  Vista «Oggi» per il tablet; preparazioni con data d'uso ed etichetta interna stampabile.
+- **Formazione**: regole regionali precaricate «da verificare» (fonti secondarie) che calcolano scadenze solo dopo
+  la conferma con l'atto; corsi per persona; firma annuale della policy con PIN, tratto e impronta del documento.
+- **Infestanti**: trappole con posizione sulla planimetria, controlli interni o ditta esterna.
+- **Analisi**: esiti collegati ai referti; prossima scadenza dalla frequenza del piano.
+- **Allergeni ed etichette**: 14 allergeni dalla tabella del consulente; schede prodotto con fonte; matrice dei
+  piatti; etichetta da ricetta con ingredienti in ordine di peso, QUID, allergeni in grassetto, tracce, tabella
+  nutrizionale calcolata (senza perdite di cottura), imballaggio e smaltimento. Stampa o PDF dal browser.
+- **Ispezione**: fascicolo stampabile del periodo.
+
+Firma elettronica: semplice rafforzata (PIN personale, ora, autore, catena di audit, immutabilità). Nessuna fonte
+ufficiale trovata sui requisiti minimi dei registri digitali: da confermare con l'ASL tramite il consulente.

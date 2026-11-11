@@ -39,6 +39,7 @@ export default async function Ricetta({ params }: { params: Promise<{ id: string
         <Link href="/ricette" className="btn btn-ghost btn-sm px-1.5" aria-label="Torna alle ricette"><ArrowLeft className="size-4" /></Link>
         <h1 className="text-lg font-semibold tracking-tight">{r.nome}</h1>
         <Badge>{r.tipo === "piatto" ? "Piatto" : "Semilavorato"}</Badge>
+        <Link href={`/ricette/${id}/etichetta`} className="btn btn-sm ml-auto">Allergeni ed etichetta</Link>
         {c && <span className="text-xs text-muted">versione {c.versione} · {num(c.porzioni, 2)} porzioni{attiva?.resa_quantita ? ` · resa ${num(attiva.resa_quantita, 3)} ${attiva.resa_unita}` : ""}</span>}
       </div>
 

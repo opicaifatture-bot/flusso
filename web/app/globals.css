@@ -151,3 +151,13 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Stampa: sfondo bianco, testo nero, niente ombre. Usata per etichette, matrici e report d'ispezione. */
+@media print {
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; color: #000 !important; }
+  .card { box-shadow: none !important; border-color: #999 !important; background: #fff !important; }
+  .text-muted, .text-subtle { color: #333 !important; }
+  .pagina-stampa { break-before: page; }
+  details { display: block; }
+}

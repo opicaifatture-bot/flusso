@@ -105,7 +105,7 @@ export function Shell({ email, ruolo, sedi, attiva, gruppo, conteggi, funzioni, 
   return (
     <div className="min-h-dvh">
       {/* Barra laterale (desktop) */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[232px] flex-col border-r border-line bg-surface lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[232px] flex-col border-r border-line bg-surface lg:flex print:hidden">
         <div className="flex h-14 items-center px-4"><Logo /></div>
         <div className="px-3"><SelettoreSede sedi={sedi} attiva={attiva} gruppo={gruppo} /></div>
         <nav className="mt-4 flex-1 overflow-y-auto px-3 pb-3" aria-label="Navigazione principale">
@@ -148,19 +148,19 @@ export function Shell({ email, ruolo, sedi, attiva, gruppo, conteggi, funzioni, 
       </aside>
 
       {/* Barra superiore (mobile) */}
-      <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-line bg-surface/90 px-4 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-line bg-surface/90 px-4 backdrop-blur lg:hidden print:hidden">
         <Logo />
         <span className="ml-1 min-w-0 flex-1 truncate text-xs text-subtle">{attiva?.nome}</span>
 
         <Tema />
       </header>
 
-      <main className="mx-auto w-full max-w-[1480px] px-4 pb-24 pt-6 lg:pb-12 lg:pl-[calc(232px+2rem)] lg:pr-8 lg:pt-8">
+      <main className="mx-auto w-full max-w-[1480px] px-4 pb-24 pt-6 lg:pb-12 lg:pl-[calc(232px+2rem)] lg:pr-8 lg:pt-8 print:max-w-none print:p-0">
         <div key={percorso} className="animate-in">{children}</div>
       </main>
 
       {/* Barra inferiore (mobile) */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid auto-cols-fr grid-flow-col border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label="Navigazione principale">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid auto-cols-fr grid-flow-col border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden print:hidden" aria-label="Navigazione principale">
         {(limitato(ruolo) ? gruppi(ruolo)[0].voci : [VOCI[0], VOCI[1], OPERATIVE[0], OPERATIVE[1]]).concat({ href: "/menu", etichetta: "Menu", icona: Menu } as Voce).map((v) => {
           const n = v.chiave ? conteggi[v.chiave] : v.href === "/menu" ? conteggi.validazione + conteggi.rincari : 0;
           return (

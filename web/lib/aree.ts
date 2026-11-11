@@ -7,8 +7,9 @@ import type { Ruolo } from "./tipi";
 export const RUOLI_AUTOCONTROLLO: Ruolo[] = ["consulente", "cucina"];
 export const limitato = (r: Ruolo | null) => !!r && RUOLI_AUTOCONTROLLO.includes(r);
 
-/** Pagina iniziale di un ruolo limitato. */
+/** Pagina iniziale di un ruolo limitato: il tablet apre i controlli del giorno. */
 export const HOME_LIMITATA = "/autocontrollo";
+export const homeLimitata = (r: Ruolo | null) => (r === "cucina" ? "/autocontrollo/oggi" : HOME_LIMITATA);
 
 /** Percorsi consentiti ai ruoli limitati. */
 export function percorsoConsentito(ruolo: Ruolo | null, percorso: string) {
