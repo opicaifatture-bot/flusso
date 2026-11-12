@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Kitchen OS Enterprise · Presentazione</title>
+<style>
+@page { size: A4; margin: 16mm 15mm 18mm; }
+* { box-sizing: border-box; }
+body { font-family: "Helvetica Neue", Arial, sans-serif; color: #1c1f24; font-size: 10.2pt; line-height: 1.5; margin: 0; }
+h1, h2, h3 { color: #0f1218; margin: 0; }
+h2 { font-size: 17pt; letter-spacing: -0.01em; margin-bottom: 4mm; padding-bottom: 2mm; border-bottom: 2px solid #0f1218; }
+h3 { font-size: 11.5pt; margin: 5mm 0 1.5mm; }
+p { margin: 0 0 2.5mm; }
+ul { margin: 0 0 3mm; padding-left: 5mm; } li { margin-bottom: 1mm; }
+.sezione { break-before: page; }
+.eyebrow { font-size: 8pt; text-transform: uppercase; letter-spacing: .14em; color: #8a6d2f; font-weight: 700; margin-bottom: 1.5mm; }
+.copertina { height: 260mm; display: flex; flex-direction: column; justify-content: space-between; background: #0f1218; color: #f2efe8; margin: -16mm -15mm 0; padding: 30mm 22mm 22mm; }
+.copertina h1 { color: #f2efe8; font-size: 34pt; line-height: 1.05; letter-spacing: -0.02em; }
+.copertina .sotto { font-size: 14pt; color: #c9c3b6; margin-top: 6mm; max-width: 140mm; line-height: 1.4; }
+.copertina .oro { color: #d4b06a; }
+.copertina .piede { font-size: 9pt; color: #9b958a; border-top: 1px solid #3a3f48; padding-top: 4mm; display: flex; justify-content: space-between; }
+.griglia { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+.griglia3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3.5mm; }
+.box { border: 1px solid #d9d5cc; border-radius: 3mm; padding: 3.5mm 4mm; background: #faf9f6; break-inside: avoid; }
+.box h4 { margin: 0 0 1.5mm; font-size: 10.5pt; color: #0f1218; }
+.box p, .box li { font-size: 9.2pt; }
+.box ul { margin-bottom: 0; }
+.scuro { background: #0f1218; color: #ece8df; border-color: #0f1218; }
+.scuro h4 { color: #d4b06a; }
+table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 2mm 0 4mm; break-inside: auto; }
+th { text-align: left; background: #0f1218; color: #f2efe8; padding: 1.8mm 2.5mm; font-weight: 600; }
+td { padding: 1.8mm 2.5mm; border-bottom: 1px solid #e3dfd6; vertical-align: top; }
+tr:nth-child(even) td { background: #faf9f6; }
+.si { color: #2d7a46; font-weight: 700; text-align: center; } .no { color: #b3ada1; text-align: center; }
+.tag { display: inline-block; font-size: 7.5pt; font-weight: 700; padding: .4mm 2mm; border-radius: 10mm; margin-right: 1mm; }
+.reale { background: #dff1e4; color: #1f6b38; } .predisposto { background: #f6ecd6; color: #8a6114; } .assente { background: #ece9e3; color: #6b665c; }
+.flusso { display: flex; gap: 2mm; align-items: stretch; margin: 3mm 0 4mm; }
+.flusso div { flex: 1; background: #f2efe8; border-radius: 2mm; padding: 2.5mm; font-size: 8.6pt; text-align: center; position: relative; }
+.flusso div b { display: block; font-size: 9.2pt; color: #0f1218; margin-bottom: .8mm; }
+.nota { font-size: 8.6pt; color: #5d5a53; border-left: 3px solid #d4b06a; padding: 1.5mm 3mm; background: #fbf8f1; margin: 3mm 0; }
+.indice li { font-size: 11pt; margin-bottom: 2mm; } .indice { columns: 2; column-gap: 10mm; padding-left: 6mm; }
+.numeri { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 4mm 0; }
+.numeri div { border-top: 3px solid #d4b06a; padding-top: 2mm; } .numeri b { display: block; font-size: 18pt; color: #0f1218; } .numeri span { font-size: 8.5pt; color: #5d5a53; }
+</style></head><body>
+
+<section class="copertina">
+  <div>
+    <p class="eyebrow" style="color:#d4b06a">Presentazione del sistema</p>
+    <h1>Kitchen OS<br><span class="oro">Enterprise</span></h1>
+    <p class="sotto">La piattaforma operativa per la ristorazione di alta gamma: acquisti e prezzi, magazzino, celle, ricette e food cost, fornitori, cantina, manutenzione e autocontrollo HACCP in un unico sistema.</p>
+  </div>
+  <div>
+    <div class="numeri" style="color:#f2efe8">
+      <div><b style="color:#f2efe8">9</b><span style="color:#b8b2a6">moduli operativi</span></div>
+      <div><b style="color:#f2efe8">6</b><span style="color:#b8b2a6">ruoli con permessi distinti</span></div>
+      <div><b style="color:#f2efe8">393</b><span style="color:#b8b2a6">verifiche automatiche sul database</span></div>
+      <div><b style="color:#f2efe8">4</b><span style="color:#b8b2a6">paesi: IT, FR, MC, CH</span></div>
+    </div>
+    <div class="piede"><span>Versione di novembre 2026</span><span>Documento informativo</span></div>
+  </div>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Indice</p>
+  <h2>Contenuti</h2>
+  <ol class="indice">
+    <li>Che cos'è e a chi serve</li><li>Come funziona: architettura</li><li>Acquisti e controllo prezzi</li><li>Catalogo master</li>
+    <li>Magazzino e lotti</li><li>Celle e temperature</li><li>Ricette e food cost</li><li>Fornitori e ordini</li>
+    <li>Cantina</li><li>Attrezzature e manutenzione</li><li>Autocontrollo HACCP</li><li>Allergeni ed etichette</li>
+    <li>Ruoli, permessi e inviti</li><li>Sicurezza e tracciabilità</li><li>Piani e abbonamenti</li><li>Integrazioni</li>
+    <li>Principi di progettazione</li><li>Stato attuale e prossimi passi</li>
+  </ol>
+
+  <h2 style="margin-top:9mm">1. Che cos'è e a chi serve</h2>
+  <p>Kitchen OS è un'applicazione web, utilizzabile da computer, tablet e telefono, pensata per ristoranti di alta gamma e gruppi con più sedi in Italia, Francia, Monaco e Svizzera. Nasce come controllo automatico delle fatture dei fornitori e si è estesa a tutte le attività operative della cucina.</p>
+  <div class="griglia">
+    <div class="box"><h4>Per il titolare</h4><p>Visione completa su spesa, rincari, margini dei piatti, valutazione dei fornitori, scadenze e conformità. Decide su approvazioni, ordini, soglie e permessi.</p></div>
+    <div class="box"><h4>Per lo chef e la brigata</h4><p>Ricette con costo reale, magazzino con prelievo per scadenza, controlli giornalieri dal tablet firmati con un PIN personale.</p></div>
+    <div class="box"><h4>Per il consulente HACCP</h4><p>Accesso dedicato al solo autocontrollo: manuale, piano dei controlli, registri, formazione e analisi, senza vedere prezzi o fatture.</p></div>
+    <div class="box"><h4>Per il commercialista</h4><p>Documenti, prezzi, totali e registro delle modifiche, senza accesso all'autocontrollo.</p></div>
+  </div>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 2</p>
+  <h2>Come funziona: architettura</h2>
+  <div class="flusso">
+    <div><b>App web</b>Next.js su Vercel, interfaccia «Midnight Obsidian» con tema chiaro e scuro</div>
+    <div><b>Database</b>Supabase (PostgreSQL) con regole di accesso per sede e ruolo</div>
+    <div><b>Automazioni</b>n8n: lettura documenti, tassi BCE, archivio mensile</div>
+    <div><b>Intelligenza artificiale</b>Claude per leggere fatture e manuali; modello di somiglianza per gli abbinamenti</div>
+  </div>
+  <ul>
+    <li><b>Multi-sede e multi-gruppo</b>: ogni utente vede solo le sedi a cui è stato invitato; il catalogo è comune al gruppo.</li>
+    <li><b>Tutte le scritture passano dal database</b>: ogni operazione verifica ruolo, sede e piano. L'interfaccia non può aggirare i controlli.</li>
+    <li><b>Registri immutabili</b>: movimenti di magazzino, letture delle celle, vendite e registrazioni HACCP non si modificano né si cancellano. Si correggono con storni o rettifiche motivate.</li>
+    <li><b>Registro delle modifiche (audit)</b>: ogni cambiamento è registrato con autore, data e valori prima/dopo, in una catena di impronte digitali che rende evidente ogni alterazione.</li>
+    <li><b>Fuso orario e valute</b>: date in ora di Roma; importi nella valuta originale e in euro al cambio ufficiale BCE del giorno del documento.</li>
+  </ul>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 3</p>
+  <h2>Acquisti e controllo prezzi</h2>
+  <div class="flusso">
+    <div><b>1. Caricamento</b>Foto, PDF o FatturaPA XML, anche da telefono</div>
+    <div><b>2. Lettura</b>L'IA estrae fornitore, righe, quantità, sconti, totali</div>
+    <div><b>3. Controlli</b>Coerenza righe e totali, duplicati, valuta</div>
+    <div><b>4. Abbinamento</b>Ogni riga collegata a un articolo del catalogo</div>
+    <div><b>5. Rincari</b>Confronto con l'acquisto precedente</div>
+  </div>
+  <div class="griglia">
+    <div class="box"><h4>Caricamento ed estrazione</h4><ul>
+      <li>Upload diretto e in background: si può caricare più documenti e continuare a lavorare.</li>
+      <li>Foto compresse nel browser; PDF e XML elettronici.</li>
+      <li>Riconoscimento dei duplicati tramite impronta del file.</li>
+      <li>Stato in tempo reale: in coda, in lavorazione, completato, errore.</li></ul></div>
+    <div class="box"><h4>Verifica e correzione</h4><ul>
+      <li>Controllo automatico di righe, sconti, imponibile e totale.</li>
+      <li>Correzione di righe e intestazione dal dettaglio del documento.</li>
+      <li>Note di credito, DDT e fatture gestiti separatamente.</li>
+      <li>Ogni correzione resta nel registro delle modifiche.</li></ul></div>
+    <div class="box"><h4>Rincari</h4><ul>
+      <li>Confronto per articolo, fornitore e unità di misura normalizzata.</li>
+      <li>Soglia percentuale e minima in euro configurabili per sede.</li>
+      <li>Rincaro accettato o contestato, con motivazione.</li></ul></div>
+    <div class="box"><h4>Panoramica</h4><ul>
+      <li>Spesa per periodo (30, 90, 365 giorni) e confronto col periodo precedente.</li>
+      <li>Fornitori e categorie principali, impatto economico dei rincari.</li>
+      <li>Documenti da rivedere e abbinamenti da validare.</li></ul></div>
+  </div>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 4</p>
+  <h2>Catalogo master</h2>
+  <p>Lo stesso prodotto compare con nomi, lingue e codici diversi a seconda del fornitore. Il catalogo master li riconduce a un unico articolo, così lo storico dei prezzi non si spezza.</p>
+  <ul>
+    <li><b>Abbinamento in tre livelli</b>: regole esatte (codice e descrizione), somiglianza semantica, giudizio dell'IA solo per i casi incerti.</li>
+    <li><b>Coda di validazione</b>: le proposte incerte vengono confermate o corrette da chef e titolare.</li>
+    <li><b>Unità di misura normalizzate</b> (kg, litro, pezzo, confezione) e <b>conversioni dichiarate</b> per articolo (es. 1 pezzo = 0,35 kg), versionate e con la fonte.</li>
+    <li>Unione di doppioni, revoca di un abbinamento, categorie per gruppo.</li>
+  </ul>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 5</p>
+  <h2>Magazzino e lotti</h2>
+  <div class="griglia">
+    <div class="box"><h4>Lotti</h4><ul>
+      <li>Ricevimento da riga di fattura o manuale: lotto, scadenza, ubicazione, costo storico.</li>
+      <li>Blocco e richiamo di un lotto con motivazione: un lotto bloccato non si può usare.</li>
+      <li>Trasferimenti tra ubicazioni e tra sedi dello stesso gruppo.</li></ul></div>
+    <div class="box"><h4>Movimenti</h4><ul>
+      <li>Consumo, scarto, reso, rottura, omaggio, apertura, rettifica.</li>
+      <li>Inventario: si dichiara il contato, il sistema registra la differenza.</li>
+      <li>Annullamenti solo con storno motivato: l'originale resta visibile.</li></ul></div>
+  </div>
+  <div class="nota">Prelievo suggerito <b>FEFO</b> (prima ciò che scade prima) o <b>FIFO</b> se il prodotto non ha scadenza. È solo un suggerimento: nessun movimento viene registrato automaticamente.</div>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 6</p>
+  <h2>Celle e temperature</h2>
+  <ul>
+    <li>Ubicazioni (celle, frigoriferi, congelatori, dispense) con intervallo di temperatura impostato dal ristorante.</li>
+    <li>Letture manuali o da sensore, con un punto di ingresso dedicato per i dispositivi e una chiave per ogni sensore.</li>
+    <li><b>Allarmi intelligenti</b>: scattano solo se il valore resta fuori limite oltre la durata impostata, si chiudono solo al rientro oltre l'isteresi e passano a «critico» dopo un tempo configurabile.</li>
+    <li><b>Dati mancanti</b>: se un sensore smette di trasmettere, l'app non mostra «tutto bene» ma apre un allarme dedicato.</li>
+    <li>Presa in carico, assegnazione e chiusura degli allarmi con descrizione dell'intervento.</li>
+  </ul>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 7</p>
+  <h2>Ricette e food cost</h2>
+  <div class="griglia">
+    <div class="box"><h4>Ricette versionate</h4><ul>
+      <li>Piatti e semilavorati, anche annidati.</li>
+      <li>Ogni modifica crea una nuova versione; le precedenti restano consultabili.</li>
+      <li>Quantità lorde o nette con resa dichiarata e relativa fonte.</li></ul></div>
+    <div class="box"><h4>Costo reale</h4><ul>
+      <li>Calcolato dall'ultimo prezzo pagato nella sede, al cambio BCE.</li>
+      <li>Per ogni ingrediente: fattura, fornitore e prezzo usati.</li>
+      <li>Se manca un dato il costo è marcato <b>incompleto</b> e l'app dice cosa serve.</li></ul></div>
+    <div class="box"><h4>Vendite e margini</h4><ul>
+      <li>Vendite registrate a mano o importate da file della cassa (CSV).</li>
+      <li>Incidenza del costo, margine per porzione e margine del periodo.</li>
+      <li>Ripartizione per pranzo e cena.</li></ul></div>
+    <div class="box"><h4>Scostamenti</h4><ul>
+      <li>Consumo teorico (dalle vendite) contro consumo effettivo (dal magazzino).</li>
+      <li>Scarti e omaggi riportati a parte.</li>
+      <li>Segnala porzioni abbondanti, scarti non registrati o ricette da aggiornare.</li></ul></div>
+  </div>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 8</p>
+  <h2>Fornitori e ordini</h2>
+  <ul>
+    <li><b>Consegne</b>: puntualità, completezza, temperatura al ricevimento.</li>
+    <li><b>Non conformità</b>: qualità, quantità, ritardo, temperatura, documenti, con gravità ed esito.</li>
+    <li><b>Valutazione dei fornitori</b>: puntualità, completezza, conformità e stabilità dei prezzi, ciascuno con il numero di eventi su cui si basa. Pesi e campione minimo li decide il titolare.</li>
+    <li><b>Confronto prezzi</b> tra fornitori sullo stesso articolo.</li>
+    <li><b>Ordini proposti</b>: lo chef propone, il titolare approva. <b>Nulla viene mai inviato automaticamente al fornitore.</b></li>
+  </ul>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 9</p>
+  <h2>Cantina</h2>
+  <ul>
+    <li>Bottiglie gestite come lotti: produttore, annata, provenienza, formato, ubicazione.</li>
+    <li>Finestra di consumo consigliata (dal… al…) con la sua fonte.</li>
+    <li>Movimenti di servizio, rottura, omaggio, inventario e trasferimenti.</li>
+    <li>Viene mostrato solo il costo storico d'acquisto: <b>nessuna stima di valore di mercato o patrimoniale</b>, per scelta.</li>
+  </ul>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 10</p>
+  <h2>Attrezzature e manutenzione</h2>
+  <ul>
+    <li>Anagrafica delle attrezzature: modello, matricola, posizione, garanzia, documentazione.</li>
+    <li>Piani di manutenzione a tempo (ogni N giorni) o a contatore (ore o cicli).</li>
+    <li>Scadenze classificate come obbligatorie (con la norma di riferimento), raccomandate o interne.</li>
+    <li>Interventi e guasti: indisponibilità, ricambi, costo, esito. Alla chiusura la scadenza successiva si aggiorna da sola.</li>
+    <li>L'app non contatta mai automaticamente le assistenze tecniche.</li>
+  </ul>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 11</p>
+  <h2>Autocontrollo HACCP</h2>
+  <p>Un'area dedicata, accessibile anche al consulente e al tablet di cucina, che sostituisce i registri cartacei.</p>
+  <div class="griglia3">
+    <div class="box scuro"><h4>Oggi (tablet)</h4><p>I controlli da fare nella giornata, preparazioni e aperture con data d'uso, ricevimento merci con foto della bolla, abbattimento, pulizie.</p></div>
+    <div class="box"><h4>Piano HACCP</h4><p>CCP, pulizie, infestanti, analisi, abbattimento, conservazione e ricevimento, con limiti, frequenze e azioni correttive.</p></div>
+    <div class="box"><h4>Registri</h4><p>Storico immutabile e firmato. Fuori limite = non conforme, con azione correttiva obbligatoria.</p></div>
+    <div class="box"><h4>Documenti</h4><p>Manuale, schede tecniche, MOCA, chimici, referti, attestati, contratti: tutti versionati e con scadenza.</p></div>
+    <div class="box"><h4>Scadenzario</h4><p>Un'unica lista per documenti, manutenzioni, formazione, firme, analisi e controlli periodici.</p></div>
+    <div class="box"><h4>Ispezione</h4><p>Fascicolo del periodo pronto da stampare o salvare in PDF.</p></div>
+  </div>
+</section>
+
+<section class="sezione">
+  <h3 style="margin-top:0">Lettura automatica del manuale</h3>
+  <div class="flusso">
+    <div><b>1. Carica</b>Il manuale o il piano analisi del consulente, in PDF</div>
+    <div><b>2. Leggi</b>L'IA propone i controlli con pagina e frase del documento</div>
+    <div><b>3. Decidi</b>«Come da manuale», «Imposta manualmente» con motivo, o «Scarta»</div>
+    <div><b>4. Usa</b>I controlli approvati compaiono sul tablet e nello scadenzario</div>
+  </div>
+  <p>L'IA estrae solo ciò che il documento scrive: se un valore manca, il campo resta vuoto. Ogni controllo che si discosta dal manuale resta segnalato con la sua motivazione.</p>
+
+  <h3>Albero delle decisioni</h3>
+  <p>Le quattro domande del documento del consulente, una alla volta: «È un CCP», «Non è un CCP» oppure «Modificare la fase». La decisione viene salvata con autore e data.</p>
+
+  <h3>Firma con PIN</h3>
+  <ul>
+    <li>Il tablet usa un unico account «Cucina»: ogni dipendente sceglie il proprio nome e inserisce il suo PIN personale.</li>
+    <li>Il PIN è salvato solo in forma cifrata; dopo 5 errori la persona resta bloccata per 15 minuti.</li>
+    <li>Ogni registrazione conserva chi, quando e cosa, e non può essere cancellata.</li>
+  </ul>
+
+  <div class="griglia">
+    <div class="box"><h4>Infestanti</h4><ul>
+      <li>Gestione interna, ditta esterna o entrambe.</li>
+      <li>Trappole posizionate sulla planimetria, con lo stato dell'ultimo controllo.</li>
+      <li>Contratto e rapporti della ditta in archivio.</li></ul></div>
+    <div class="box"><h4>Analisi</h4><ul>
+      <li>Acqua (inclusi parametri come i PFAS) e alimenti o superfici.</li>
+      <li>Esito collegato al referto del laboratorio.</li>
+      <li>Prossima analisi calcolata dalla frequenza del piano.</li></ul></div>
+    <div class="box"><h4>Formazione del personale</h4><ul>
+      <li>Regole regionali (moduli, ore, validità, requisiti dei docenti).</li>
+      <li>Le regole precaricate sono «da verificare» finché non vengono confermate con la delibera.</li>
+      <li>Corsi, aggiornamenti e addestramenti per persona, con attestato.</li></ul></div>
+    <div class="box"><h4>Policy di igiene</h4><ul>
+      <li>Firma annuale di ogni dipendente con PIN e firma tracciata a mano.</li>
+      <li>Viene salvata l'impronta del documento firmato: si può dimostrare quale versione è stata letta.</li>
+      <li>Scadenza annuale nello scadenzario.</li></ul></div>
+  </div>
+  <div class="nota">Conservazione minima dei registri: <b>2 anni</b>, non riducibile. Le correzioni sono rettifiche che lasciano visibile l'originale.</div>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 12</p>
+  <h2>Allergeni ed etichette</h2>
+  <div class="griglia">
+    <div class="box"><h4>Schede prodotto</h4><ul>
+      <li>I 14 allergeni di legge, «può contenere tracce», ingredienti e valori nutrizionali per 100 g.</li>
+      <li>Fonte sempre indicata: scheda tecnica, etichetta o inserimento manuale.</li></ul></div>
+    <div class="box"><h4>Matrice allergeni dei piatti</h4><ul>
+      <li>Calcolata dalle ricette, anche con semilavorati.</li>
+      <li>Segnala i piatti con ingredienti privi di scheda.</li>
+      <li>Stampabile per sala e personale.</li></ul></div>
+    <div class="box"><h4>Etichetta per asporto e preconfezionati</h4><ul>
+      <li>Ingredienti in ordine di peso con percentuale (QUID).</li>
+      <li>Allergeni in grassetto, tracce, tabella nutrizionale calcolata.</li>
+      <li>Peso netto, conservazione, modalità d'uso, imballaggio e smaltimento.</li></ul></div>
+    <div class="box"><h4>Etichette interne</h4><ul>
+      <li>Per preparazioni e confezioni aperte: prodotto, data, «da usare entro», lotto, operatore.</li>
+      <li>Stampa diretta dal tablet.</li></ul></div>
+  </div>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 13</p>
+  <h2>Ruoli, permessi e inviti</h2>
+  <table>
+    <tr><th>Cosa</th><th>Titolare</th><th>Chef</th><th>Contabile</th><th>Sola lettura</th><th>Consulente HACCP</th><th>Cucina (tablet)</th></tr>
+    <tr><td>Fatture, prezzi, magazzino, ricette</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td></tr>
+    <tr><td>Caricare fatture, correggere righe</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+    <tr><td>Approvare rincari, catalogo, ordini</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+    <tr><td>Magazzino, ricette, interventi</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+    <tr><td>Consultare l'autocontrollo</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="si">✓</td><td class="si">✓</td><td class="si">✓</td></tr>
+    <tr><td>Definire il piano HACCP</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="si">✓</td><td class="no">—</td></tr>
+    <tr><td>Firmare i registri con PIN</td><td class="si">✓</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="si">✓</td></tr>
+    <tr><td>Inviti, team, impostazioni</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+    <tr><td>Registro delle modifiche</td><td class="si">✓</td><td class="no">—</td><td class="si">✓</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+  </table>
+  <p><b>Inviti</b>: il titolare invita per email con ruolo e sede. Il link è personale, scade in 7 giorni e si usa una volta sola. L'invitato sceglie la propria password e conferma l'email. Creazione, invio, accettazione e revoca restano nel registro delle modifiche.</p>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 14</p>
+  <h2>Sicurezza e tracciabilità</h2>
+  <ul>
+    <li><b>Isolamento per sede</b>: le regole del database impediscono di vedere dati di sedi o gruppi a cui non si ha accesso, anche interrogando il database direttamente.</li>
+    <li><b>Separazione dei dati economici</b>: consulente e tablet non vedono prezzi, fatture, costi né margini.</li>
+    <li><b>Registro delle modifiche a catena</b>: ogni voce include l'impronta della precedente; una manomissione viene rilevata da una verifica eseguibile dall'app.</li>
+    <li><b>Archivio mensile</b> del registro in uno spazio separato, come ancora esterna di verifica.</li>
+    <li><b>Segreti protetti</b>: token d'invito, chiavi dei sensori e PIN conservati solo in forma cifrata, in tabelle non accessibili dall'app.</li>
+    <li><b>Nessuna cancellazione silenziosa</b>: documenti, persone, controlli e registrazioni si archiviano o si rettificano, non si eliminano.</li>
+  </ul>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 15</p>
+  <h2>Piani e abbonamenti</h2>
+  <table>
+    <tr><th>Piano</th><th>Moduli inclusi</th></tr>
+    <tr><td><b>Essenziale</b></td><td>Acquisti e controllo prezzi</td></tr>
+    <tr><td><b>Operativo</b></td><td>Acquisti, magazzino, celle, manutenzione, autocontrollo HACCP</td></tr>
+    <tr><td><b>Completo</b></td><td>Tutti i moduli: anche ricette e food cost, fornitori, cantina</td></tr>
+  </table>
+  <ul>
+    <li>Il piano è verificato dal database insieme al ruolo: nessuno dei due può aggirare l'altro.</li>
+    <li>Ad abbonamento scaduto o sospeso i dati restano consultabili, ma non si registrano nuove operazioni.</li>
+    <li>Prezzi, durata della prova e limiti di sedi e utenti non sono ancora definiti: la struttura è pronta, le condizioni commerciali no.</li>
+  </ul>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 16</p>
+  <h2>Integrazioni</h2>
+  <table>
+    <tr><th>Integrazione</th><th>Stato</th><th>Dettaglio</th></tr>
+    <tr><td>Database, autenticazione, archivio file</td><td><span class="tag reale">Attiva</span></td><td>Supabase</td></tr>
+    <tr><td>Lettura fatture e manuali con IA</td><td><span class="tag reale">Attiva</span></td><td>n8n e Claude; la lettura dei manuali è da collaudare su un documento reale</td></tr>
+    <tr><td>Cambi valuta ufficiali BCE</td><td><span class="tag reale">Attiva</span></td><td>Aggiornamento giornaliero CHF, USD, GBP</td></tr>
+    <tr><td>Email di conferma account</td><td><span class="tag reale">Attiva</span></td><td>Tramite la casella Gmail del ristorante</td></tr>
+    <tr><td>Email automatica degli inviti</td><td><span class="tag predisposto">Predisposta</span></td><td>Oggi il link si consegna a mano; servirebbe un dominio proprio</td></tr>
+    <tr><td>Sensori di temperatura</td><td><span class="tag predisposto">Predisposta</span></td><td>Punto di ingresso pronto, nessun dispositivo collegato</td></tr>
+    <tr><td>Sistema di cassa</td><td><span class="tag predisposto">Parziale</span></td><td>Import da file CSV; nessun collegamento diretto</td></tr>
+    <tr><td>Pagamenti</td><td><span class="tag predisposto">Predisposta</span></td><td>Nessun incasso possibile finché prezzi e condizioni non sono definiti</td></tr>
+    <tr><td>Notifiche fuori dall'app (SMS, email, push)</td><td><span class="tag assente">Da realizzare</span></td><td>Oggi gli allarmi si vedono solo aprendo l'app</td></tr>
+  </table>
+
+  <p class="eyebrow" style="margin-top:6mm">Capitolo 17</p>
+  <h2>Principi di progettazione</h2>
+  <div class="griglia">
+    <div class="box"><h4>Nessun dato inventato</h4><p>Pesi, rese, conversioni, soglie, valori normativi e prestazioni dei fornitori vengono solo da documenti o da chi li inserisce. Se un dato manca, l'app lo dice.</p></div>
+    <div class="box"><h4>Tutto tracciabile</h4><p>Ogni numero mostra la sua origine: la fattura, il cambio, la versione della ricetta, la pagina del manuale.</p></div>
+    <div class="box"><h4>Decide sempre una persona</h4><p>Ordini, abbinamenti incerti, proposte dal manuale e rincari sono proposte da approvare, mai azioni automatiche.</p></div>
+    <div class="box"><h4>Nessuna conformità dichiarata</h4><p>L'app supporta l'autocontrollo ma non attesta la conformità normativa: limiti e procedure sono quelli del manuale del ristorante.</p></div>
+  </div>
+</section>
+
+<section class="sezione">
+  <p class="eyebrow">Capitolo 18</p>
+  <h2>Stato attuale e prossimi passi</h2>
+  <h3>Già operativo</h3>
+  <ul>
+    <li>Tutti i moduli descritti sono in produzione, con ruoli, inviti e permessi funzionanti.</li>
+    <li>393 verifiche automatiche su calcoli, permessi, isolamento delle sedi e immutabilità dei registri.</li>
+    <li>Account dimostrativo popolato con dati di esempio: personale, celle, piano HACCP, registri, ricette ed etichette.</li>
+  </ul>
+  <h3>Da completare</h3>
+  <ul>
+    <li><b>Collaudo con documenti reali</b>: lettura del manuale HACCP e del piano analisi del consulente.</li>
+    <li><b>Formazione regionale</b>: conferma delle regole della Liguria sul testo delle delibere.</li>
+    <li><b>Validità della firma su tablet</b>: conferma con l'ASL competente, tramite il consulente.</li>
+    <li><b>Avvisi fuori dall'app</b> per gli allarmi delle celle: scelta del canale (email, SMS, messaggistica).</li>
+    <li><b>Sensori di temperatura</b>: scelta del dispositivo e collegamento.</li>
+    <li><b>Condizioni commerciali</b>: prezzi dei piani, durata della prova, attivazione dei pagamenti.</li>
+    <li><b>Dominio proprio</b> per l'invio automatico delle email d'invito.</li>
+  </ul>
+  <div class="nota" style="margin-top:8mm">Documento informativo sulle funzionalità del sistema. I dati mostrati nell'account dimostrativo sono di esempio e non si riferiscono ad alcuna azienda reale.</div>
+</section>
+</body></html>
