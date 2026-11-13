@@ -180,3 +180,26 @@ Migrazione `20261113092000_autocontrollo_completo.sql`; flusso n8n `n8n/estrazio
 
 Firma elettronica: semplice rafforzata (PIN personale, ora, autore, catena di audit, immutabilità). Nessuna fonte
 ufficiale trovata sui requisiti minimi dei registri digitali: da confermare con l'ASL tramite il consulente.
+
+## Sala: QR al tavolo, ordini, cucina, conto e pagamento
+
+Migrazioni `20261114090000_ruolo_sala.sql` e `20261114091000_sala_ordini_pagamenti.sql`. Funzione di piano `sala` (piano completo).
+
+- **Ruolo «Sala (camerieri)»**: vede servizio, display cucina e menu; non vede fatture, prezzi d'acquisto, vendite né margini.
+- **Tavoli e QR** (`/sala/tavoli`): ogni tavolo ha un token casuale; il QR punta a `/t/<token>`. Il QR funziona
+  **solo mentre il tavolo è aperto** dalla sala e smette alla chiusura; «Nuovo QR» invalida quello vecchio.
+- **Cliente** (`/t/<token>`, senza account): menu in IT/EN/FR/DE/ES con traduzioni scritte dal ristorante,
+  allergeni calcolati dalle ricette (o dichiarati sulla voce) e filtro «escludi allergeni», ordine con note,
+  chiamata del cameriere, acqua, pane, richiesta del conto, conto in tempo reale, divisione (tutto, parti uguali,
+  per piatti, importo libero) e mancia. Limite di 6 ordini dal tavolo ogni 10 minuti.
+- **Servizio** (`/sala`): mappa dei tavoli, richieste con suono e notifica, apertura/chiusura, coperti,
+  ordini dalla sala, piatti pronti → servito, annullamenti motivati, pagamenti in sala (POS o contanti).
+- **Display cucina** (`/sala/cucina`): comande per tavolo e reparto, tempo d'attesa, «Inizia» e «Pronto».
+- **Food cost automatico**: ogni piatto servito con ricetta collegata diventa una vendita (pranzo prima delle 17).
+- **Pagamento online**: adattatore `web/lib/sala/pagamenti.ts`. Senza servizio collegato i pagamenti dal
+  tavolo sono registrati come **prova** (nessun addebito). La modalità «attivo» non è impostabile dall'app.
+  Webhook `/api/sala/pagamenti/<servizio>` predisposto (risponde 501).
+- **Cassa fiscale**: adattatore `web/lib/sala/cassa.ts`, nessuna cassa collegata. Ogni pagamento resta
+  «scontrino da emettere» finché la sala non annota il numero dello scontrino battuto sul registratore telematico.
+- **Avvisi**: in tempo reale finché la pagina è aperta sul telefono (suono, vibrazione, notifica del browser).
+  Notifiche push a schermo spento non realizzate.
