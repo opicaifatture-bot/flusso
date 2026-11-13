@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { BookOpen, ChefHat, ClipboardCheck, ChevronsUpDown, FileText, LayoutDashboard, ListChecks, LogOut, Menu, Moon, Package, Settings, Sun, Thermometer, TrendingUp, Truck, Upload, Wine, Wrench } from "lucide-react";
+import { BookOpen, ChefHat, ClipboardCheck, ConciergeBell, CookingPot, QrCode, UtensilsCrossed, ChevronsUpDown, FileText, LayoutDashboard, ListChecks, LogOut, Menu, Moon, Package, Settings, Sun, Thermometer, TrendingUp, Truck, Upload, Wine, Wrench } from "lucide-react";
 import { cn } from "@/lib/format";
 import { RUOLI, type Ruolo } from "@/lib/tipi";
 import { limitato } from "@/lib/aree";
@@ -34,6 +34,12 @@ const OPERATIVE: Voce[] = [
   { href: "/cantina", etichetta: "Cantina", icona: Wine, funzione: "cantina" },
   { href: "/manutenzione", etichetta: "Manutenzione", icona: Wrench, funzione: "manutenzione" },
 ];
+const SALA: Voce[] = [
+  { href: "/sala", etichetta: "Servizio", icona: ConciergeBell, funzione: "sala" },
+  { href: "/sala/cucina", etichetta: "Display cucina", icona: CookingPot, funzione: "sala" },
+  { href: "/sala/menu", etichetta: "Menu digitale", icona: UtensilsCrossed, funzione: "sala" },
+  { href: "/sala/tavoli", etichetta: "Tavoli e QR", icona: QrCode, funzione: "sala" },
+];
 const AUTOCONTROLLO: Voce[] = [
   { href: "/autocontrollo", etichetta: "Autocontrollo", icona: ClipboardCheck, funzione: "autocontrollo" },
 ];
@@ -41,11 +47,12 @@ const FINALI: Voce[] = [{ href: "/impostazioni", etichetta: "Impostazioni", icon
 
 /** Gruppi del menu per ruolo: consulente e cucina vedono solo l'autocontrollo e le celle. */
 function gruppi(ruolo: Ruolo | null): { titolo: string | null; voci: Voce[] }[] {
+  if (ruolo === "sala") return [{ titolo: "Sala", voci: [SALA[0], SALA[1], SALA[2]] }];
   if (limitato(ruolo)) {
-    const voci = [...AUTOCONTROLLO, OPERATIVE[0], ...(ruolo === "consulente" ? [OPERATIVE[5]] : [])];
+    const voci = [...AUTOCONTROLLO, OPERATIVE[0], ...(ruolo === "consulente" ? [OPERATIVE[5]] : [SALA[1]])];
     return [{ titolo: "Autocontrollo", voci }];
   }
-  return [{ titolo: "Acquisti", voci: VOCI }, { titolo: "Operations", voci: OPERATIVE }, { titolo: "Sicurezza alimentare", voci: AUTOCONTROLLO }, { titolo: null, voci: FINALI }];
+  return [{ titolo: "Acquisti", voci: VOCI }, { titolo: "Operations", voci: OPERATIVE }, { titolo: "Sala", voci: SALA }, { titolo: "Sicurezza alimentare", voci: AUTOCONTROLLO }, { titolo: null, voci: FINALI }];
 }
 
 function Logo() {
@@ -100,7 +107,7 @@ function SelettoreSede({ sedi, attiva, gruppo }: { sedi: Sede[]; attiva: Sede | 
 
 export function Shell({ email, ruolo, sedi, attiva, gruppo, conteggi, funzioni, children }: Props) {
   const percorso = usePathname();
-  const attivo = (href: string) => (href === "/" ? percorso === "/" : percorso.startsWith(href));
+  const attivo = (href: string) => (href === "/" ? percorso === "/" : href === "/sala" ? percorso === "/sala" : percorso.startsWith(href));
 
   return (
     <div className="min-h-dvh">

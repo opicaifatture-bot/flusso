@@ -15,6 +15,8 @@ const SCRITTURE = new Set([
   "salva_persona", "imposta_pin", "identifica_operatore", "archivia_file", "aggiorna_archivio",
   "salva_controllo", "valuta_albero", "decidi_proposta", "registra", "salva_regola_formazione", "registra_formazione", "firma_policy",
   "salva_trappola", "imposta_sede_autocontrollo", "salva_info_prodotto", "salva_dati_etichetta",
+  "imposta_sala", "salva_tavolo", "rigenera_qr", "apri_tavolo", "imposta_coperti", "chiudi_tavolo", "salva_voce_menu", "imposta_esaurito",
+  "ordina_dalla_sala", "avanza_riga", "gestisci_chiamata", "registra_pagamento_sala", "segna_scontrino",
 ]);
 const LETTURE = new Set(["suggerisci_prelievo", "confronta_fornitori", "costo_ricetta"]);
 
