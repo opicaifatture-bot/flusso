@@ -11,7 +11,7 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       <div className="relative w-full max-w-[360px] animate-in">
         <div className="mb-8 text-center">
           <span className="mx-auto grid size-10 place-items-center rounded-xl bg-inverse text-base font-bold text-inverse-fg">P</span>
-          <h1 className="mt-5 text-xl font-semibold tracking-tight">Price Guardian</h1>
+          <h1 className="mt-5 text-xl font-semibold tracking-tight">Kitchen OS</h1>
           <p className="mt-1 text-[13px] text-muted">Contabilità invisibile e controllo prezzi</p>
         </div>
         <form action={accedi} className="card space-y-4 p-6 shadow-pop">

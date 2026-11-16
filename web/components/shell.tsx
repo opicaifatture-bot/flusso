@@ -52,7 +52,7 @@ function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2.5">
       <span className="grid size-6 place-items-center rounded-md bg-inverse text-[11px] font-bold text-inverse-fg">P</span>
-      <span className="text-[13px] font-semibold tracking-tight">Price Guardian</span>
+      <span className="text-[13px] font-semibold tracking-tight">Kitchen OS</span>
     </Link>
   );
 }

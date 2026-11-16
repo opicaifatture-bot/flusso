@@ -5,7 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
 export const metadata: Metadata = {
-  title: { default: "Price Guardian", template: "%s · Price Guardian" },
+  title: { default: "Kitchen OS", template: "%s · Kitchen OS" },
   description: "Contabilità invisibile e controllo prezzi per la ristorazione di lusso",
 };
 export const viewport: Viewport = { themeColor: "#09090b", width: "device-width", initialScale: 1 };

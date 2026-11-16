@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Kitchen OS — Brochure</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@page { size: 297mm 210mm; margin: 0 }
+:root{--nero:#0e0d0c;--nero2:#171513;--nero3:#211e1b;--linea:#2e2a26;--crema:#f2ece3;--crema2:#e7dfd3;--grigio:#9b9389;--grigio2:#6f685f;--rame:#c58a4a;--rame2:#e0b07a;--ok:#5fae7c;--warn:#d9a441;--danger:#d0634f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;color:var(--crema);background:var(--nero);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pag{width:297mm;height:210mm;position:relative;overflow:hidden;page-break-after:always;padding:16mm 18mm;background:var(--nero)}
+.chiara{background:var(--crema);color:var(--nero)}
+.serif{font-family:Fraunces,serif;font-weight:300;letter-spacing:-.01em}
+h1{font-family:Fraunces,serif;font-weight:300;font-size:60pt;line-height:1;letter-spacing:-.02em}
+h2{font-family:Fraunces,serif;font-weight:300;font-size:32pt;line-height:1.08;letter-spacing:-.015em}
+h3{font-size:11pt;font-weight:600;margin-bottom:2mm}
+p,li{font-size:10pt;line-height:1.55;color:var(--grigio)}
+.chiara p,.chiara li{color:#5b544c}
+.occhiello{font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:var(--rame);font-weight:600;margin-bottom:5mm}
+.piede{position:absolute;bottom:9mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-size:7pt;letter-spacing:.15em;text-transform:uppercase;color:var(--grigio2)}
+em{font-style:italic;color:var(--rame2)}
+.chiara em{color:var(--rame)}
+.griglia{display:grid;gap:7mm}
+.due{grid-template-columns:1fr 1.25fr;align-items:center;height:100%}
+.tre{grid-template-columns:repeat(3,1fr)}
+.quattro{grid-template-columns:repeat(4,1fr)}
+.carta{border:1px solid var(--linea);border-radius:3mm;padding:6mm;background:var(--nero2)}
+.chiara .carta{background:#fbf8f3;border-color:#ddd3c4}
+.num{font-family:Fraunces,serif;font-size:26pt;color:var(--rame);font-weight:300;line-height:1}
+ul.punti{list-style:none;margin-top:5mm}
+ul.punti li{padding:2.2mm 0 2.2mm 6mm;border-top:1px solid var(--linea);position:relative}
+.chiara ul.punti li{border-color:#ddd3c4}
+ul.punti li:before{content:"";position:absolute;left:0;top:4.4mm;width:2mm;height:2mm;border-radius:50%;background:var(--rame)}
+ul.punti b{color:var(--crema);font-weight:500}.chiara ul.punti b{color:var(--nero)}
+/* ── finta interfaccia ── */
+.app{background:#0b0b0c;border:1px solid #2a2a2c;border-radius:3mm;overflow:hidden;font-size:7pt;color:#e9e9ea;box-shadow:0 10mm 25mm rgba(0,0,0,.55)}
+.barra{height:6mm;background:#141415;border-bottom:1px solid #232325;display:flex;align-items:center;gap:1.4mm;padding:0 3mm}
+.barra i{width:1.8mm;height:1.8mm;border-radius:50%;background:#3a3a3c;display:block}
+.corpo{display:flex}
+.lato{width:30mm;border-right:1px solid #1f1f21;padding:3mm 2.5mm;background:#0e0e0f}
+.lato b{display:block;font-size:6pt;color:#6d6d72;letter-spacing:.1em;margin:2.5mm 0 1mm}
+.lato span{display:block;padding:1mm 1.5mm;border-radius:1mm;color:#b9b9bd;font-size:6.5pt}
+.lato span.on{background:#1d1d1f;color:#fff}
+.cont{flex:1;padding:4mm}
+.tit{font-size:10pt;font-weight:600;margin-bottom:.6mm}.sot{color:#86868b;font-size:6pt;margin-bottom:3mm}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:2mm;margin-bottom:2.5mm}
+.kpi{border:1px solid #232325;border-radius:1.5mm;padding:2mm}
+.kpi small{display:block;color:#7d7d82;font-size:5pt;letter-spacing:.08em;text-transform:uppercase}
+.kpi strong{font-size:11pt;font-weight:600;display:block;margin-top:.8mm}
+.kpi em{font-style:normal;font-size:5.5pt;color:#8a8a8f}
+.box{border:1px solid #232325;border-radius:1.5mm;padding:2.5mm}
+table.t{width:100%;border-collapse:collapse}
+table.t th{text-align:left;color:#7d7d82;font-weight:500;font-size:5.5pt;padding:1.2mm 1mm;border-bottom:1px solid #232325}
+table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
+.r{text-align:right}.mono{font-variant-numeric:tabular-nums}
+.bd{display:inline-block;border-radius:1mm;padding:.3mm 1.2mm;font-size:5.3pt;font-weight:500}
+.bd.ok{background:rgba(95,174,124,.15);color:#7fd19d}.bd.warn{background:rgba(217,164,65,.16);color:#f0c46b}.bd.dg{background:rgba(208,99,79,.17);color:#ff8f78}.bd.n{background:#202022;color:#b5b5b9}
+.barre{display:flex;align-items:flex-end;gap:1.6mm;height:24mm;margin-top:2mm}
+.barre div{flex:1;background:#3b3b3e;border-radius:.6mm .6mm 0 0}.barre div.hi{background:var(--rame)}
+.prog{height:1mm;background:#232325;border-radius:1mm;margin:.8mm 0 2mm}.prog i{display:block;height:100%;background:#8c8c90;border-radius:1mm}
+.tel{width:62mm;border-radius:9mm;border:2.2mm solid #1c1c1e;background:#0b0b0c;overflow:hidden;box-shadow:0 10mm 25mm rgba(0,0,0,.55);font-size:7pt;color:#eee}
+.tel .schermo{padding:6mm 4mm 5mm}
+.chiamata{background:linear-gradient(180deg,#1d2a22,#0b0b0c 70%)}
+.cerchio{width:13mm;height:13mm;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12pt;margin:auto}
+.nota{font-size:7pt;color:var(--grigio2);margin-top:4mm}
+.chiara .nota{color:#8b8378}
+.logo{display:flex;align-items:center;gap:3.5mm}
+.logo .w{font-family:Fraunces,serif;font-size:19pt;font-weight:400;letter-spacing:-.01em}
+.logo .w b{font-weight:600;color:var(--rame)}
+.piani{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:7mm}
+.piano{border:1px solid #ddd3c4;border-radius:3mm;padding:7mm 6mm;background:#fbf8f3;position:relative}
+.piano.top{background:var(--nero);color:var(--crema);border-color:var(--nero)}
+.piano.top p,.piano.top li{color:#b9b0a4}
+.piano h3{font-family:Fraunces,serif;font-weight:400;font-size:20pt;margin-bottom:1mm}
+.piano .per{font-size:8pt;color:var(--rame);letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:4mm}
+.piano ul{list-style:none}.piano li{font-size:8.8pt;padding:1.4mm 0 1.4mm 5mm;position:relative;border-top:1px solid #e7dfd3}
+.piano.top li{border-color:#2e2a26}
+.piano li:before{content:"✓";position:absolute;left:0;color:var(--rame);font-weight:600}
+.piano .prezzo{margin-top:5mm;font-family:Fraunces,serif;font-size:12pt}
+</style></head><body>
+
+<!-- 1 COPERTINA -->
+<section class="pag" style="padding:0">
+  <svg width="100%" height="100%" viewBox="0 0 1123 794" style="position:absolute;inset:0" aria-hidden="true">
+    <defs><radialGradient id="g" cx="78%" cy="40%" r="60%"><stop offset="0" stop-color="#3a2614"/><stop offset=".55" stop-color="#16110d"/><stop offset="1" stop-color="#0e0d0c"/></radialGradient></defs>
+    <rect width="1123" height="794" fill="url(#g)"/>
+    <g fill="none" stroke="#c58a4a" stroke-opacity=".16"><circle cx="860" cy="330" r="150"/><circle cx="860" cy="330" r="230"/><circle cx="860" cy="330" r="310"/><circle cx="860" cy="330" r="390"/></g>
+  </svg>
+  <div style="position:absolute;left:18mm;top:16mm" class="logo">
+    <svg width="34" height="34" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#c58a4a"/><path d="M20 44V20m0 12 14-12M24 30l12 14" stroke="#0e0d0c" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="45" cy="22" r="4" fill="#0e0d0c"/></svg>
+    <span class="w">Kitchen <b>OS</b></span>
+  </div>
+  <div style="position:absolute;left:18mm;bottom:34mm;width:170mm">
+    <p class="occhiello">Il gestionale per la ristorazione</p>
+    <h1>Tutta la tua cucina,<br><em>sotto controllo.</em></h1>
+    <p style="font-size:12pt;margin-top:8mm;max-width:140mm;color:#c9bfb2">Fatture, costi, magazzino, temperature, HACCP e sala in un unico posto. Meno tempo in ufficio, più tempo dove conta.</p>
+  </div>
+  <div class="piede"><span>Kitchen OS · by Opic.AI</span><span>opicai.it</span></div>
+</section>
+
+<!-- 2 PROMESSA -->
+<section class="pag chiara">
+  <p class="occhiello">Perché Kitchen OS</p>
+  <h2 style="max-width:200mm">Il titolare di un ristorante fa dieci mestieri.<br><em>Kitchen OS ne semplifica la metà.</em></h2>
+  <div class="griglia quattro" style="margin-top:13mm">
+    <div class="carta"><div class="num">01</div><h3 style="margin-top:5mm">Costi sotto controllo</h3><p>Ogni fattura diventa dati: sai quanto spendi, con chi, per cosa, e ti accorgi subito quando un fornitore alza i prezzi.</p></div>
+    <div class="carta"><div class="num">02</div><h3 style="margin-top:5mm">HACCP senza carta</h3><p>Controlli, registri, formazione, analisi e scadenze in digitale, firmati dal personale e pronti per l'ispezione.</p></div>
+    <div class="carta"><div class="num">03</div><h3 style="margin-top:5mm">Fatture che si leggono da sole</h3><p>Carichi il PDF o una foto: l'intelligenza artificiale estrae fornitore, righe, prezzi e le archivia per fornitore.</p></div>
+    <div class="carta"><div class="num">04</div><h3 style="margin-top:5mm">Tempo restituito</h3><p>Niente fogli Excel, quaderni o raccoglitori: il lavoro amministrativo si riduce a pochi controlli guidati.</p></div>
+  </div>
+  <p style="margin-top:12mm;max-width:210mm;font-size:11pt">Kitchen OS è pensato per trattorie, ristoranti, pizzerie e gruppi con più sedi. Si usa dal computer, dal tablet in cucina e dallo smartphone, senza installare nulla.</p>
+  <div class="piede"><span>Kitchen OS</span><span>02</span></div>
+</section>
+
+<!-- 3 PANORAMICA -->
+<section class="pag">
+  <div class="griglia due">
+    <div>
+      <p class="occhiello">Panoramica</p>
+      <h2>Un colpo d'occhio<br><em>su tutto il locale.</em></h2>
+      <p style="margin-top:6mm">Appena entri vedi la spesa del periodo, i rincari da gestire, i documenti da verificare e i fornitori che pesano di più. Ogni numero è cliccabile e porta al dettaglio.</p>
+      <ul class="punti">
+        <li><b>Spesa per mese e per categoria</b>, al netto delle note di credito</li>
+        <li><b>Rincari da gestire</b> con l'impatto economico</li>
+        <li><b>Più sedi</b>: passi da un locale all'altro con un clic</li>
+      </ul>
+    </div>
+    <div class="app"><div class="barra"><i></i><i></i><i></i></div><div class="corpo">
+      <div class="lato"><b>ACQUISTI</b><span class="on">Panoramica</span><span>Documenti</span><span>Rincari</span><span>Catalogo</span><b>OPERATIONS</b><span>Celle</span><span>Magazzino</span><span>Ricette</span><span>Fornitori</span><span>Cantina</span><b>SALA</b><span>Servizio</span><span>Cucina</span><b>SICUREZZA</b><span>Autocontrollo</span></div>
+      <div class="cont"><div class="tit">Panoramica</div><div class="sot">Osteria di esempio · ultimi 90 giorni</div>
+        <div class="kpis"><div class="kpi"><small>Spesa · 90 gg</small><strong class="mono">48.260 €</strong><em>fatture − note di credito</em></div><div class="kpi"><small>Rincari da gestire</small><strong style="color:#f0c46b">7</strong><em>impatto 612 € / mese</em></div><div class="kpi"><small>Da verificare</small><strong>3</strong><em>righe da confermare</em></div><div class="kpi"><small>Documenti</small><strong>186</strong><em>24 fornitori</em></div></div>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:2mm">
+          <div class="box"><b style="font-size:7pt">Spesa per mese</b><div class="barre"><div style="height:55%"></div><div style="height:62%"></div><div style="height:58%"></div><div style="height:70%"></div><div style="height:66%"></div><div style="height:74%"></div><div style="height:69%"></div><div style="height:80%"></div><div style="height:76%"></div><div style="height:85%"></div><div style="height:79%"></div><div class="hi" style="height:92%"></div></div></div>
+          <div class="box"><b style="font-size:7pt">Spesa per categoria</b><div style="margin-top:2mm">Carni<span style="float:right" class="mono">14.820 €</span><div class="prog"><i style="width:86%"></i></div>Pesce<span style="float:right" class="mono">9.410 €</span><div class="prog"><i style="width:55%"></i></div>Frutta e verdura<span style="float:right" class="mono">6.230 €</span><div class="prog"><i style="width:36%"></i></div>Vini<span style="float:right" class="mono">5.980 €</span><div class="prog"><i style="width:34%"></i></div>Latticini<span style="float:right" class="mono">4.115 €</span><div class="prog"><i style="width:24%"></i></div></div></div>
+        </div></div></div></div>
+  </div>
+  <div class="piede"><span>Immagini illustrative con dati di esempio</span><span>03</span></div>
+</section>
+
+<!-- 4 FATTURE PER FORNITORE -->
+<section class="pag chiara">
+  <div class="griglia due">
+    <div>
+      <p class="occhiello">Fatture e fornitori</p>
+      <h2>Carichi la fattura.<br><em>Al resto pensa l'IA.</em></h2>
+      <p style="margin-top:6mm">Fatture elettroniche, PDF, foto scattate col telefono o documenti esteri: Kitchen OS li legge, riconosce il fornitore e ogni riga, converte le valute e li mette nel contenitore giusto.</p>
+      <ul class="punti">
+        <li><b>Un archivio per ogni fornitore</b> con tutte le sue fatture, DDT e note di credito</li>
+        <li><b>Spesa per anno</b> e articoli acquistati con l'ultimo prezzo pagato</li>
+        <li><b>Controllo umano</b>: le righe incerte vengono segnalate, mai inventate</li>
+        <li><b>Valutazione dei fornitori</b> su prezzi e affidabilità</li>
+      </ul>
+    </div>
+    <div class="app"><div class="barra"><i></i><i></i><i></i></div><div class="cont">
+      <div class="tit">Caseificio Valle Verde</div><div class="sot">IT · P. IVA 0123•••••01</div>
+      <div class="kpis"><div class="kpi"><small>Documenti</small><strong>42</strong></div><div class="kpi"><small>Spesa 2026</small><strong class="mono">11.384 €</strong></div><div class="kpi"><small>Spesa totale</small><strong class="mono">27.902 €</strong></div><div class="kpi"><small>Ultimo documento</small><strong>12/11/2026</strong></div></div>
+      <div style="display:flex;gap:1.5mm;margin-bottom:2mm"><span class="bd n" style="background:#e9e9ea;color:#111">Tutti</span><span class="bd n">2026 · 11.384 €</span><span class="bd n">2025 · 16.518 €</span></div>
+      <table class="t"><tr><th>Documento</th><th>Data</th><th class="r">Totale</th><th>Stato</th></tr>
+      <tr><td>Fattura 1184</td><td>12/11/2026</td><td class="r mono">642,80 €</td><td><span class="bd ok">Verificato</span></td></tr>
+      <tr><td>Fattura 1151</td><td>05/11/2026</td><td class="r mono">588,20 €</td><td><span class="bd dg">1 rincaro</span></td></tr>
+      <tr><td>DDT 3307</td><td>05/11/2026</td><td class="r mono">—</td><td><span class="bd n">DDT</span></td></tr>
+      <tr><td>Fattura 1119</td><td>29/10/2026</td><td class="r mono">701,45 €</td><td><span class="bd ok">Verificato</span></td></tr>
+      <tr><td>Nota di credito 48</td><td>22/10/2026</td><td class="r mono">−36,00 €</td><td><span class="bd ok">Verificato</span></td></tr>
+      <tr><td>Fattura 1087</td><td>21/10/2026</td><td class="r mono">615,10 €</td><td><span class="bd warn">2 da verificare</span></td></tr></table>
+    </div></div>
+  </div>
+  <div class="piede"><span>Immagini illustrative con dati di esempio</span><span>04</span></div>
+</section>
+
+<!-- 5 RINCARI -->
+<section class="pag">
+  <div class="griglia due">
+    <div>
+      <p class="occhiello">Rincari e prezzi</p>
+      <h2>Ti accorgi dei rincari<br><em>prima che pesino sul conto.</em></h2>
+      <p style="margin-top:6mm">Ogni acquisto viene confrontato con il precedente dello stesso articolo, alla stessa unità di misura. Se il prezzo sale, ricevi la segnalazione con l'impatto stimato sul mese.</p>
+      <ul class="punti">
+        <li><b>Catalogo unico</b> degli articoli, anche se ogni fornitore li chiama in modo diverso</li>
+        <li><b>Storico prezzi</b> di ogni prodotto, fornitore per fornitore</li>
+        <li><b>Confronti onesti</b>: niente paragoni tra formati o unità diverse</li>
+      </ul>
+    </div>
+    <div class="app"><div class="barra"><i></i><i></i><i></i></div><div class="cont">
+      <div class="tit">Rincari da gestire</div><div class="sot">7 aperti · impatto stimato 612 € al mese</div>
+      <table class="t"><tr><th>Articolo</th><th>Fornitore</th><th class="r">Prima</th><th class="r">Ora</th><th class="r">Var.</th><th class="r">Impatto/mese</th></tr>
+      <tr><td>Mozzarella fior di latte</td><td>Caseificio Valle Verde</td><td class="r mono">8,90 €/kg</td><td class="r mono">9,80 €/kg</td><td class="r"><span class="bd dg">+10,1%</span></td><td class="r mono">148 €</td></tr>
+      <tr><td>Olio EVO</td><td>Frantoio del Colle</td><td class="r mono">9,40 €/l</td><td class="r mono">10,20 €/l</td><td class="r"><span class="bd dg">+8,5%</span></td><td class="r mono">96 €</td></tr>
+      <tr><td>Controfiletto di manzo</td><td>Carni Rossi</td><td class="r mono">27,50 €/kg</td><td class="r mono">29,10 €/kg</td><td class="r"><span class="bd warn">+5,8%</span></td><td class="r mono">212 €</td></tr>
+      <tr><td>Pomodorini datterini</td><td>Ortofrutta Sole</td><td class="r mono">3,20 €/kg</td><td class="r mono">3,45 €/kg</td><td class="r"><span class="bd warn">+7,8%</span></td><td class="r mono">58 €</td></tr>
+      <tr><td>Farina tipo 0</td><td>Molino Antico</td><td class="r mono">0,92 €/kg</td><td class="r mono">0,97 €/kg</td><td class="r"><span class="bd warn">+5,4%</span></td><td class="r mono">41 €</td></tr></table>
+      <div class="box" style="margin-top:2.5mm"><b style="font-size:7pt">Olio EVO · storico prezzi</b>
+      <svg viewBox="0 0 300 60" style="width:100%;height:18mm;margin-top:1mm"><polyline points="0,48 40,46 80,47 120,40 160,38 200,36 240,30 300,18" fill="none" stroke="#c58a4a" stroke-width="2"/><g fill="#c58a4a"><circle cx="240" cy="30" r="2.5"/><circle cx="300" cy="18" r="3"/></g></svg></div>
+    </div></div>
+  </div>
+  <div class="piede"><span>Immagini illustrative con dati di esempio</span><span>05</span></div>
+</section>
+
+<!-- 6 MAGAZZINO RICETTE -->
+<section class="pag chiara">
+  <p class="occhiello">Magazzino, ricette, cantina</p>
+  <h2>Sai quanto ti costa ogni piatto.<br><em>E quanto ti fa guadagnare.</em></h2>
+  <div class="griglia tre" style="margin-top:10mm">
+    <div class="carta"><h3>Magazzino</h3><p>Lotti, scadenze e movimenti di ogni prodotto, divisi per cella e dispensa. Il carico arriva dalle fatture, lo scarico dalle vendite e dagli sprechi registrati.</p>
+      <div class="app" style="margin-top:5mm;box-shadow:none"><div class="cont"><table class="t"><tr><th>Lotto</th><th>Scade</th><th class="r">Giacenza</th></tr><tr><td>Mozzarella</td><td><span class="bd warn">tra 2 gg</span></td><td class="r mono">6 kg</td></tr><tr><td>Guanciale</td><td>28/11</td><td class="r mono">3,4 kg</td></tr><tr><td>Burrata</td><td><span class="bd dg">oggi</span></td><td class="r mono">8 pz</td></tr></table></div></div></div>
+    <div class="carta"><h3>Ricette e food cost</h3><p>Costruisci le ricette con gli articoli del catalogo: il costo si aggiorna da solo a ogni nuova fattura, con incidenza e margine di ogni piatto.</p>
+      <div class="app" style="margin-top:5mm;box-shadow:none"><div class="cont"><table class="t"><tr><th>Piatto</th><th class="r">Costo</th><th class="r">Prezzo</th><th class="r">Incid.</th></tr><tr><td>Carbonara</td><td class="r mono">2,85 €</td><td class="r mono">14 €</td><td class="r"><span class="bd ok">20%</span></td></tr><tr><td>Tagliata</td><td class="r mono">8,90 €</td><td class="r mono">24 €</td><td class="r"><span class="bd warn">37%</span></td></tr><tr><td>Tiramisù</td><td class="r mono">1,40 €</td><td class="r mono">7 €</td><td class="r"><span class="bd ok">20%</span></td></tr></table></div></div></div>
+    <div class="carta"><h3>Etichette e allergeni</h3><p>Dalla ricetta nascono l'etichetta con ingredienti in ordine di peso e i 14 allergeni evidenziati, e la matrice allergeni del menu da mostrare ai clienti.</p>
+      <div style="margin-top:5mm;background:#fff;border:1px solid #ddd3c4;border-radius:2mm;padding:4mm;font-size:7pt;color:#222;line-height:1.5"><b style="font-size:8pt">Tiramisù della casa</b><br>Ingredienti: mascarpone (<b>latte</b>), savoiardi (farina di <b>frumento</b>, zucchero, <b>uova</b>), caffè, zucchero, <b>uova</b>, cacao.<br><span style="color:#777">Conservare a +4 °C</span></div></div>
+  </div>
+  <p class="nota">Inclusa anche la <b>cantina</b>: etichette, bottiglie, giacenze e rotazione dei vini. Immagini illustrative con dati di esempio.</p>
+  <div class="piede"><span>Kitchen OS</span><span>06</span></div>
+</section>
+
+<!-- 7 CELLE -->
+<section class="pag">
+  <div class="griglia" style="grid-template-columns:1fr 1.15fr;align-items:center;height:100%">
+    <div>
+      <p class="occhiello">Celle e temperature</p>
+      <h2>Se il frigo sbaglia,<br><em>il tuo telefono squilla.</em></h2>
+      <p style="margin-top:6mm">Imposti per ogni cella le temperature e il tempo di tolleranza indicati nel tuo piano HACCP. Se la temperatura resta fuori, Kitchen OS apre un allarme e <b style="color:var(--crema)">chiama il responsabile</b>.</p>
+      <ul class="punti">
+        <li><b>Chiamata vocale</b>: chi risponde preme 1 e l'allarme passa a suo nome</li>
+        <li><b>Catena di reperibilità</b>: se nessuno conferma, chiama il successivo, poi un SMS a tutti</li>
+        <li><b>Registro automatico</b> di letture, allarmi e azioni correttive</li>
+        <li><b>Sensori</b>: le letture arrivano in automatico se i rilevatori di temperatura già presenti nel locale consentono il collegamento; altrimenti si registrano dal tablet</li>
+      </ul>
+    </div>
+    <div style="display:flex;gap:7mm;align-items:center;justify-content:center">
+      <div class="app" style="width:92mm"><div class="cont">
+        <div class="tit">Celle e temperature</div><div class="sot">aggiornato ora</div>
+        <div class="box" style="border-color:rgba(208,99,79,.5);background:rgba(208,99,79,.09);margin-bottom:2mm"><b>Cella carni · Temperatura alta</b> <span class="bd dg">Critico</span><br><span style="color:#aaa">Sopra 4 °C da 34 minuti · valore estremo 8,6 °C</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2mm">
+          <div class="box"><b>Cella carni</b><div style="font-size:15pt;margin:1mm 0;color:#ff8f78" class="mono">8,6 °C</div><span class="bd dg">In allarme</span></div>
+          <div class="box"><b>Cella pesce</b><div style="font-size:15pt;margin:1mm 0" class="mono">1,8 °C</div><span class="bd ok">In intervallo</span></div>
+          <div class="box"><b>Congelatore</b><div style="font-size:15pt;margin:1mm 0" class="mono">−19,4 °C</div><span class="bd ok">In intervallo</span></div>
+          <div class="box"><b>Frigo bar</b><div style="font-size:15pt;margin:1mm 0" class="mono">5,1 °C</div><span class="bd ok">In intervallo</span></div>
+        </div></div></div>
+      <div class="tel chiamata"><div class="schermo" style="text-align:center;height:118mm;display:flex;flex-direction:column">
+        <p style="font-size:6.5pt;color:#9bb5a4">chiamata in arrivo</p>
+        <p style="font-size:14pt;color:#fff;margin-top:3mm;font-family:Fraunces,serif">Kitchen OS</p>
+        <p style="font-size:6.5pt;color:#9a9a9a">Allarme temperatura</p>
+        <div style="margin:9mm 0;background:rgba(255,255,255,.06);border-radius:3mm;padding:3mm;text-align:left;font-size:6.6pt;color:#ddd;line-height:1.5">«Attenzione, allarme temperatura. Cella carni: sopra 4 gradi da 34 minuti. Premi 1 per confermare che te ne occupi.»</div>
+        <div style="margin-top:auto;display:flex;justify-content:space-around"><div class="cerchio" style="background:#c9493a">✕</div><div class="cerchio" style="background:#3fa463">✆</div></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="piede"><span>Immagini illustrative con dati di esempio</span><span>07</span></div>
+</section>
+
+<!-- 8 HACCP -->
+<section class="pag chiara">
+  <div class="griglia due">
+    <div>
+      <p class="occhiello">Autocontrollo HACCP</p>
+      <h2>Il manuale HACCP<br><em>diventa operativo.</em></h2>
+      <p style="margin-top:6mm">Kitchen OS legge il tuo manuale di autocontrollo e ne propone i controlli, i punti critici e il piano analisi. Tu o il tuo consulente approvate, e da lì la cucina sa cosa fare ogni giorno.</p>
+      <ul class="punti">
+        <li><b>Controlli del giorno</b> sul tablet, firmati da ogni operatore con il proprio PIN</li>
+        <li><b>Registri non modificabili</b>: le correzioni restano tracciate</li>
+        <li><b>Scadenzario</b> di formazione, analisi, disinfestazione e documenti</li>
+        <li><b>Allergeni, infestanti, analisi, schede prodotto</b> in un unico archivio</li>
+        <li><b>Dossier per l'ispezione</b> pronto da stampare in un clic</li>
+        <li><b>Accesso dedicato al consulente HACCP</b>, senza vedere i dati economici</li>
+      </ul>
+    </div>
+    <div class="app"><div class="barra"><i></i><i></i><i></i></div><div class="cont">
+      <div class="tit">Controlli di oggi</div><div class="sot">lunedì 16 novembre · 9 su 12 completati</div>
+      <table class="t"><tr><th>Controllo</th><th>Quando</th><th>Firmato da</th><th>Esito</th></tr>
+      <tr><td>Temperatura celle — apertura</td><td>08:05</td><td>M. R.</td><td><span class="bd ok">Conforme</span></td></tr>
+      <tr><td>Ricevimento merce — Carni Rossi</td><td>09:40</td><td>G. F.</td><td><span class="bd ok">Conforme</span></td></tr>
+      <tr><td>Abbattimento ragù</td><td>11:15</td><td>L. B.</td><td><span class="bd warn">Azione correttiva</span></td></tr>
+      <tr><td>Pulizia piani di lavoro</td><td>15:30</td><td>S. C.</td><td><span class="bd ok">Conforme</span></td></tr>
+      <tr><td>Olio di frittura</td><td>—</td><td>—</td><td><span class="bd n">Da fare</span></td></tr>
+      <tr><td>Temperatura celle — chiusura</td><td>—</td><td>—</td><td><span class="bd n">Da fare</span></td></tr></table>
+      <div class="box" style="margin-top:2.5mm"><b>Scadenzario</b><br><span class="bd dg">scaduto</span> Analisi acqua potabile &nbsp; <span class="bd warn">tra 12 gg</span> Formazione alimentarista · 2 persone &nbsp; <span class="bd ok">ok</span> Disinfestazione</div>
+    </div></div>
+  </div>
+  <div class="piede"><span>Kitchen OS supporta l'autocontrollo: la conformità resta responsabilità dell'operatore e del suo consulente</span><span>08</span></div>
+</section>
+
+<!-- 9 SALA -->
+<section class="pag">
+  <div class="griglia" style="grid-template-columns:1fr 1.1fr;align-items:center;height:100%">
+    <div>
+      <p class="occhiello">Sala e ordini al tavolo</p>
+      <h2>Il cliente ordina dal tavolo.<br><em>La cucina lo vede subito.</em></h2>
+      <p style="margin-top:6mm">Ogni tavolo ha il suo QR. Il cliente inquadra, sfoglia il menu con gli allergeni in cinque lingue, ordina e chiama il cameriere. I camerieri lavorano dal proprio smartphone.</p>
+      <ul class="punti">
+        <li><b>Schermo comande in cucina</b>, piatto per piatto, con i tempi</li>
+        <li><b>Mappa dei tavoli</b> in tempo reale e chiamate dei clienti</li>
+        <li><b>Piatti esauriti</b> nascosti con un tocco</li>
+        <li><b>Pagamento al tavolo e cassa fiscale</b>: disponibili se la cassa già in dotazione consente il collegamento</li>
+        <li><b>Vendite collegate al magazzino</b> e al food cost</li>
+      </ul>
+    </div>
+    <div style="display:flex;gap:7mm;align-items:center;justify-content:center">
+      <div class="tel"><div class="schermo" style="height:122mm">
+        <p style="font-size:6pt;color:#8a8a8f">Tavolo 12 · Osteria di esempio</p>
+        <p style="font-family:Fraunces,serif;font-size:13pt;margin:1.5mm 0 3mm">Menu</p>
+        <div style="display:flex;gap:1.2mm;margin-bottom:3mm"><span class="bd n" style="background:#eee;color:#111">Primi</span><span class="bd n">Secondi</span><span class="bd n">Dolci</span><span class="bd n">Vini</span></div>
+        <div class="box" style="margin-bottom:2mm"><b>Tonnarelli cacio e pepe</b><span style="float:right" class="mono">13 €</span><br><span style="color:#8a8a8f;font-size:5.8pt">Allergeni: glutine, latte</span></div>
+        <div class="box" style="margin-bottom:2mm"><b>Carbonara</b><span style="float:right" class="mono">14 €</span><br><span style="color:#8a8a8f;font-size:5.8pt">Allergeni: glutine, uova, latte</span></div>
+        <div class="box" style="margin-bottom:2mm;opacity:.45"><b>Amatriciana</b><span style="float:right">esaurito</span></div>
+        <div style="position:absolute"></div>
+        <div style="margin-top:6mm;display:grid;grid-template-columns:1fr 1fr;gap:2mm"><div style="border:1px solid #333;border-radius:2mm;padding:2.2mm;text-align:center">Chiama cameriere</div><div style="background:#c58a4a;color:#111;border-radius:2mm;padding:2.2mm;text-align:center;font-weight:600">Ordina · 2 piatti</div></div>
+      </div></div>
+      <div class="app" style="width:78mm"><div class="cont"><div class="tit">Cucina</div><div class="sot">comande in arrivo</div>
+        <div class="box" style="margin-bottom:2mm"><b>Tavolo 12</b> <span class="bd warn">da 4 min</span><br>1× Carbonara<br>1× Tonnarelli cacio e pepe</div>
+        <div class="box" style="margin-bottom:2mm"><b>Tavolo 5</b> <span class="bd n">in preparazione</span><br>2× Tagliata · 1 al sangue</div>
+        <div class="box"><b>Tavolo 9</b> <span class="bd ok">pronto</span><br>3× Tiramisù</div></div></div>
+    </div>
+  </div>
+  <div class="piede"><span>Immagini illustrative con dati di esempio</span><span>09</span></div>
+</section>
+
+<!-- 10 TEAM -->
+<section class="pag chiara">
+  <p class="occhiello">Il team</p>
+  <h2>Ognuno vede<br><em>solo quello che gli serve.</em></h2>
+  <div class="griglia tre" style="margin-top:10mm">
+    <div class="carta"><h3>Titolare</h3><p>Tutto: costi, sedi, abbonamento, utenti e permessi.</p></div>
+    <div class="carta"><h3>Chef</h3><p>Cucina, magazzino, ricette, celle e HACCP, con i costi delle materie prime.</p></div>
+    <div class="carta"><h3>Cucina</h3><p>Un solo accesso condiviso sul tablet: controlli, registri e comande, senza dati economici. Ogni firma è personale, con PIN.</p></div>
+    <div class="carta"><h3>Sala</h3><p>Tavoli, ordini e chiamate dei clienti dallo smartphone del cameriere.</p></div>
+    <div class="carta"><h3>Commercialista</h3><p>Fatture, documenti e spesa in sola consultazione, senza poter modificare nulla.</p></div>
+    <div class="carta"><h3>Consulente HACCP</h3><p>Piano, registri e scadenze di autocontrollo, senza accesso ai dati economici.</p></div>
+  </div>
+  <p class="nota">Inviti via email con link monouso. I permessi sono verificati dal sistema a ogni operazione, non solo nascosti nell'interfaccia.</p>
+  <div class="piede"><span>Kitchen OS</span><span>10</span></div>
+</section>
+
+<!-- 11 SICUREZZA -->
+<section class="pag">
+  <p class="occhiello">Sicurezza e dati</p>
+  <h2>I tuoi dati restano tuoi.<br><em>E restano in Europa.</em></h2>
+  <div class="griglia tre" style="margin-top:10mm">
+    <div class="carta"><div class="num">EU</div><h3 style="margin-top:4mm">Server in Europa</h3><p>Il database risiede in un data center dell'Unione Europea (Francoforte), nel rispetto del GDPR.</p></div>
+    <div class="carta"><div class="num">⟂</div><h3 style="margin-top:4mm">Dati separati per cliente</h3><p>Ogni ristorante vede solo i propri dati: la separazione è applicata direttamente dal database, riga per riga.</p></div>
+    <div class="carta"><div class="num">🔒</div><h3 style="margin-top:4mm">Connessioni cifrate</h3><p>Tutto il traffico passa su HTTPS. Password e PIN non sono mai conservati in chiaro.</p></div>
+    <div class="carta"><div class="num">≡</div><h3 style="margin-top:4mm">Registro delle attività</h3><p>Ogni operazione importante è tracciata con autore e orario, in un registro protetto da manomissioni.</p></div>
+    <div class="carta"><div class="num">⧉</div><h3 style="margin-top:4mm">Registri non cancellabili</h3><p>Letture, controlli HACCP e movimenti non si modificano: le correzioni si aggiungono e restano visibili.</p></div>
+    <div class="carta"><div class="num">↓</div><h3 style="margin-top:4mm">Sempre esportabili</h3><p>Documenti e registri si stampano o si esportano quando vuoi. Anche a fine abbonamento i dati restano consultabili.</p></div>
+  </div>
+  <div class="piede"><span>Kitchen OS</span><span>11</span></div>
+</section>
+
+<!-- 12 PIANI -->
+<section class="pag chiara">
+  <p class="occhiello">I piani</p>
+  <h2>Parti da quello che ti serve.<br><em>Cresci quando vuoi.</em></h2>
+  <div class="piani">
+    <div class="piano"><h3>Essenziale</h3><div class="per">Acquisti e costi</div><ul>
+      <li>Fatture lette dall'intelligenza artificiale</li><li>Archivio per fornitore</li><li>Rincari con impatto economico</li><li>Catalogo e storico prezzi</li><li>Panoramica della spesa</li><li>Accesso per il commercialista</li></ul></div>
+    <div class="piano"><h3>Operativo</h3><div class="per">Tutto l'Essenziale, più</div><ul>
+      <li>Magazzino, lotti e scadenze</li><li>Celle e temperature</li><li>Chiamate d'allarme al responsabile</li><li>Manutenzione attrezzature</li><li>Autocontrollo HACCP completo</li><li>Accesso per il consulente HACCP</li></ul></div>
+    <div class="piano top"><h3>Completo</h3><div class="per">Tutto l'Operativo, più</div><ul>
+      <li>Ricette e food cost</li><li>Etichette e matrice allergeni</li><li>Valutazione dei fornitori</li><li>Cantina vini</li><li>Sala: QR al tavolo e ordini dal cliente</li><li>Schermo comande in cucina</li></ul></div>
+  </div>
+  <p class="nota" style="font-size:9pt;margin-top:6mm"><b style="color:var(--nero)">Prezzo in base al piano e al numero di sedi.</b> Primo mese di prova gratuito · assistenza inclusa in tutti i piani.</p>
+  <div class="piede"><span>Kitchen OS</span><span>12</span></div>
+</section>
+
+<!-- 13 CONTATTI -->
+<section class="pag" style="padding:0">
+  <svg width="100%" height="100%" viewBox="0 0 1123 794" style="position:absolute;inset:0" aria-hidden="true"><defs><radialGradient id="g2" cx="20%" cy="90%" r="70%"><stop offset="0" stop-color="#3a2614"/><stop offset=".6" stop-color="#14100d"/><stop offset="1" stop-color="#0e0d0c"/></radialGradient></defs><rect width="1123" height="794" fill="url(#g2)"/></svg>
+  <div style="position:relative;padding:16mm 18mm;height:100%;display:grid;grid-template-columns:1.1fr 1fr;gap:14mm">
+    <div style="display:flex;flex-direction:column">
+      <p class="occhiello">Inizia ora</p>
+      <h2 style="font-size:38pt">Un mese gratis<br><em>per toccare con mano.</em></h2>
+      <ul class="punti" style="margin-top:9mm">
+        <li><b>Primo mese di prova gratuito</b>, senza impegno</li>
+        <li><b>Assistenza</b> nell'avvio e durante l'uso</li>
+        <li><b>Team dedicato su richiesta</b> per sviluppare funzioni su misura per il tuo locale</li>
+      </ul>
+      <div class="logo" style="margin-top:auto">
+        <svg width="30" height="30" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#c58a4a"/><path d="M20 44V20m0 12 14-12M24 30l12 14" stroke="#0e0d0c" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="45" cy="22" r="4" fill="#0e0d0c"/></svg>
+        <span class="w" style="font-size:16pt">Kitchen <b>OS</b></span></div>
+    </div>
+    <div class="carta" style="align-self:center;padding:10mm;background:rgba(23,21,19,.85)">
+      <p class="occhiello">Contatti</p>
+      <p style="font-family:Fraunces,serif;font-size:22pt;color:var(--crema);line-height:1.1">Opic.AI</p>
+      <p style="margin-top:1mm">Milano · operiamo in tutta Italia, di persona o in videochiamata</p>
+      <div style="margin-top:7mm;display:grid;grid-template-columns:22mm 1fr;row-gap:2.8mm;font-size:10pt">
+        <span style="color:var(--grigio2)">Telefono</span><span>+39 348 275 0780 <span style="color:var(--grigio2)">· anche WhatsApp</span></span>
+        <span style="color:var(--grigio2)">Email</span><span>teamopicai@gmail.com</span>
+        <span style="color:var(--grigio2)">Sito</span><span>opicai.it</span>
+        <span style="color:var(--grigio2)">Instagram</span><span>@opicai.it</span>
+      </div>
+      <p style="margin-top:9mm;font-size:7pt;color:var(--grigio2);line-height:1.6">Opic.AI è un marchio di Iperuranio Trading &amp; Consulting S.r.l.s. · Via Nuoro 15, 20128 Milano (MI)<br>P. IVA e C.F. 13849820967 · REA MI-2747671 · Capitale sociale € 1.000 i.v. · PEC iperuranio.trading@legalmail.it</p>
+    </div>
+  </div>
+</section>
+</body></html>
