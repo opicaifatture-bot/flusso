@@ -15,7 +15,7 @@ esegui() { psql -q -v ON_ERROR_STOP=1 -1 -d "$db" -f "$1" >/dev/null 2>"$tmp" ||
 esegui "$qui/00_ambiente.sql"
 for m in "$qui"/../migrations/*.sql; do
   # pg_cron e pgvector non servono ai test: l'ambiente fornisce dei segnaposto.
-  sed -e '/create extension if not exists pg_cron/d' -e '/create extension if not exists vector/d' \
+  sed -e '/create extension if not exists pg_cron/d' -e '/create extension if not exists vector/d' -e '/create extension if not exists pg_net/d' \
       -e 's/extensions\.vector(384)/extensions.vector/g' -e '/using hnsw/d' -e 's/::vector /::extensions.vector /g' "$m" > "$tmp.sql"
   esegui "$tmp.sql"; rm -f "$tmp.sql"
 done

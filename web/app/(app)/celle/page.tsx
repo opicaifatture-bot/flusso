@@ -61,7 +61,9 @@ export default async function Celle({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <InDiretta ristoranteId={attivo.id} inLavorazione={aperti.length > 0} />
-      <Intestazione titolo="Celle e temperature" sottotitolo={<>{attivo.nome} · temperature in °C · orari Europe/Rome</>} />
+      <Intestazione titolo="Celle e temperature" sottotitolo={<>{attivo.nome} · temperature in °C · orari Europe/Rome</>}>
+        <Link href="/celle/chiamate" className="btn">Chiamate d&apos;allarme</Link>
+      </Intestazione>
       <StatoModulo piano={piano} inclusa={inclusa} scrivibile={scrivibile} nome="Celle e temperature" />
 
       {aperti.length > 0 && (

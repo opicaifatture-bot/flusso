@@ -7,7 +7,7 @@ import type { Esito } from "./tipi";
 // Le sole RPC che l'interfaccia può invocare tramite i moduli generici.
 // Ruolo, sede e piano sono verificati dal database a ogni chiamata.
 const SCRITTURE = new Set([
-  "salva_ubicazione", "registra_lettura", "crea_sensore", "imposta_stato_sensore", "gestisci_allarme",
+  "salva_ubicazione", "registra_lettura", "salva_contatto_allarme", "elimina_contatto_allarme", "imposta_chiamate", "crea_sensore", "imposta_stato_sensore", "gestisci_allarme",
   "ricevi_lotto", "registra_movimento", "storna_movimento", "conta_lotto", "imposta_stato_lotto", "trasferisci_lotto",
   "imposta_conversione", "salva_ricetta", "registra_vendita", "storna_vendita",
   "registra_consegna", "apri_non_conformita", "chiudi_non_conformita", "imposta_scorecard", "proponi_ordine", "decidi_ordine",

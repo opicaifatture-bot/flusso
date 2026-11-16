@@ -28,3 +28,9 @@ alter default privileges in schema public grant all on tables to anon, authentic
 alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;
 -- L'utente presente prima delle migrazioni diventa titolare, come in produzione.
 insert into auth.users (id, email) values ('00000000-0000-0000-0000-00000000000a', 'titolare@test.invalid');
+
+-- pg_net: le richieste HTTP vengono solo registrate.
+create schema net;
+create table net.richieste (id bigint generated always as identity primary key, url text, body jsonb);
+create function net.http_post(url text, body jsonb default '{}', params jsonb default '{}', headers jsonb default '{}', timeout_milliseconds int default 5000)
+returns bigint language sql as $$ insert into net.richieste (url, body) values (url, body) returning id $$;
