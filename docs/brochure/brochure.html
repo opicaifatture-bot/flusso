@@ -19,9 +19,12 @@ p,li{font-size:10pt;line-height:1.55;color:var(--grigio)}
 em{font-style:italic;color:var(--rame2)}
 .chiara em{color:var(--rame)}
 .griglia{display:grid;gap:7mm}
-.due{grid-template-columns:1fr 1.25fr;align-items:center;height:100%}
-.tre{grid-template-columns:repeat(3,1fr)}
-.quattro{grid-template-columns:repeat(4,1fr)}
+.due{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);align-items:center;height:100%}
+.griglia>*{min-width:0}
+.app{max-width:100%}
+table.t{table-layout:fixed}table.t td,table.t th{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tre{grid-template-columns:repeat(3,minmax(0,1fr))}
+.quattro{grid-template-columns:repeat(4,minmax(0,1fr))}
 .carta{border:1px solid var(--linea);border-radius:3mm;padding:6mm;background:var(--nero2)}
 .chiara .carta{background:#fbf8f3;border-color:#ddd3c4}
 .num{font-family:Fraunces,serif;font-size:26pt;color:var(--rame);font-weight:300;line-height:1}
@@ -31,7 +34,7 @@ ul.punti li{padding:2.2mm 0 2.2mm 6mm;border-top:1px solid var(--linea);position
 ul.punti li:before{content:"";position:absolute;left:0;top:4.4mm;width:2mm;height:2mm;border-radius:50%;background:var(--rame)}
 ul.punti b{color:var(--crema);font-weight:500}.chiara ul.punti b{color:var(--nero)}
 /* ── finta interfaccia ── */
-.app{background:#0b0b0c;border:1px solid #2a2a2c;border-radius:3mm;overflow:hidden;font-size:7pt;color:#e9e9ea;box-shadow:0 10mm 25mm rgba(0,0,0,.55)}
+.app{background:#0b0b0c;border:1px solid #2a2a2c;border-radius:3mm;overflow:hidden;font-size:7pt;color:#e9e9ea;box-shadow:none}
 .barra{height:6mm;background:#141415;border-bottom:1px solid #232325;display:flex;align-items:center;gap:1.4mm;padding:0 3mm}
 .barra i{width:1.8mm;height:1.8mm;border-radius:50%;background:#3a3a3c;display:block}
 .corpo{display:flex}
@@ -56,15 +59,15 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
 .barre{display:flex;align-items:flex-end;gap:1.6mm;height:24mm;margin-top:2mm}
 .barre div{flex:1;background:#3b3b3e;border-radius:.6mm .6mm 0 0}.barre div.hi{background:var(--rame)}
 .prog{height:1mm;background:#232325;border-radius:1mm;margin:.8mm 0 2mm}.prog i{display:block;height:100%;background:#8c8c90;border-radius:1mm}
-.tel{width:62mm;border-radius:9mm;border:2.2mm solid #1c1c1e;background:#0b0b0c;overflow:hidden;box-shadow:0 10mm 25mm rgba(0,0,0,.55);font-size:7pt;color:#eee}
+.tel{flex:none;width:56mm;border-radius:9mm;border:2.2mm solid #1c1c1e;background:#0b0b0c;overflow:hidden;box-shadow:none;font-size:7pt;color:#eee}
 .tel .schermo{padding:6mm 4mm 5mm}
 .chiamata{background:linear-gradient(180deg,#1d2a22,#0b0b0c 70%)}
 .cerchio{width:13mm;height:13mm;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12pt;margin:auto}
 .nota{font-size:7pt;color:var(--grigio2);margin-top:4mm}
 .chiara .nota{color:#8b8378}
 .logo{display:flex;align-items:center;gap:3.5mm}
-.logo .w{font-family:Orbitron,sans-serif;font-weight:700;font-size:17pt;letter-spacing:.08em;background:linear-gradient(180deg,#ffd98a,#e9a33c 55%,#b0702c);-webkit-background-clip:text;background-clip:text;color:transparent}
-.opic{mix-blend-mode:lighten;display:block}
+.logo .w{font-family:Orbitron,sans-serif;font-weight:700;font-size:17pt;letter-spacing:.08em;color:#e7a643}
+.opic{display:block}
 .piani{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:7mm}
 .piano{border:1px solid #ddd3c4;border-radius:3mm;padding:7mm 6mm;background:#fbf8f3;position:relative}
 .piano.top{background:var(--nero);color:var(--crema);border-color:var(--nero)}
@@ -97,8 +100,8 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
 
 <!-- 2 PROMESSA -->
 <section class="pag chiara">
-  <p class="occhiello">Perché Kitchen OS</p>
-  <h2 style="max-width:200mm">Il titolare di un ristorante fa dieci mestieri.<br><em>Kitchen OS ne semplifica la metà.</em></h2>
+  <p class="occhiello">Perché Kitchen OS · quattro risposte concrete</p>
+  <h2 style="max-width:220mm">Fatture, costi, controlli, scadenze.<br><em>Finalmente tutto in un solo posto.</em></h2>
   <div class="griglia quattro" style="margin-top:13mm">
     <div class="carta"><div class="num">01</div><h3 style="margin-top:5mm">Costi sotto controllo</h3><p>Ogni fattura diventa dati: sai quanto spendi, con chi, per cosa, e ti accorgi subito quando un fornitore alza i prezzi.</p></div>
     <div class="carta"><div class="num">02</div><h3 style="margin-top:5mm">HACCP senza carta</h3><p>Controlli, registri, formazione, analisi e scadenze in digitale, firmati dal personale e pronti per l'ispezione.</p></div>
@@ -210,7 +213,7 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
 
 <!-- 7 CELLE -->
 <section class="pag">
-  <div class="griglia" style="grid-template-columns:1fr 1.15fr;align-items:center;height:100%">
+  <div class="griglia" style="grid-template-columns:minmax(0,1fr) 146mm;align-items:center;height:100%">
     <div>
       <p class="occhiello">Celle e temperature</p>
       <h2>Se il frigo sbaglia,<br><em>il tuo telefono squilla.</em></h2>
@@ -222,8 +225,8 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
         <li><b>Sensori</b>: le letture arrivano in automatico se i rilevatori di temperatura già presenti nel locale consentono il collegamento; altrimenti si registrano dal tablet</li>
       </ul>
     </div>
-    <div style="display:flex;gap:7mm;align-items:center;justify-content:center">
-      <div class="app" style="width:92mm"><div class="cont">
+    <div style="display:flex;gap:6mm;align-items:center;justify-content:flex-end;width:146mm">
+      <div class="app" style="width:84mm;flex:none"><div class="cont">
         <div class="tit">Celle e temperature</div><div class="sot">aggiornato ora</div>
         <div class="box" style="border-color:rgba(208,99,79,.5);background:rgba(208,99,79,.09);margin-bottom:2mm"><b>Cella carni · Temperatura alta</b> <span class="bd dg">Critico</span><br><span style="color:#aaa">Sopra 4 °C da 34 minuti · valore estremo 8,6 °C</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:2mm">
@@ -232,7 +235,7 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
           <div class="box"><b>Congelatore</b><div style="font-size:15pt;margin:1mm 0" class="mono">−19,4 °C</div><span class="bd ok">In intervallo</span></div>
           <div class="box"><b>Frigo bar</b><div style="font-size:15pt;margin:1mm 0" class="mono">5,1 °C</div><span class="bd ok">In intervallo</span></div>
         </div></div></div>
-      <div class="tel chiamata"><div class="schermo" style="text-align:center;height:118mm;display:flex;flex-direction:column">
+      <div class="tel chiamata"><div class="schermo" style="text-align:center;height:112mm;display:flex;flex-direction:column">
         <p style="font-size:6.5pt;color:#9bb5a4">chiamata in arrivo</p>
         <p style="font-size:14pt;color:#fff;margin-top:3mm;font-family:Fraunces,serif">Kitchen OS</p>
         <p style="font-size:6.5pt;color:#9a9a9a">Allarme temperatura</p>
@@ -277,7 +280,7 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
 
 <!-- 9 SALA -->
 <section class="pag">
-  <div class="griglia" style="grid-template-columns:1fr 1.1fr;align-items:center;height:100%">
+  <div class="griglia" style="grid-template-columns:minmax(0,1fr) 146mm;align-items:center;height:100%">
     <div>
       <p class="occhiello">Sala e ordini al tavolo</p>
       <h2>Il cliente ordina dal tavolo.<br><em>La cucina lo vede subito.</em></h2>
@@ -290,8 +293,8 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
         <li><b>Vendite collegate al magazzino</b> e al food cost</li>
       </ul>
     </div>
-    <div style="display:flex;gap:7mm;align-items:center;justify-content:center">
-      <div class="tel"><div class="schermo" style="height:122mm">
+    <div style="display:flex;gap:6mm;align-items:center;justify-content:flex-end;width:146mm">
+      <div class="tel"><div class="schermo" style="height:116mm">
         <p style="font-size:6pt;color:#8a8a8f">Tavolo 12 · Osteria di esempio</p>
         <p style="font-family:Fraunces,serif;font-size:13pt;margin:1.5mm 0 3mm">Menu</p>
         <div style="display:flex;gap:1.2mm;margin-bottom:3mm"><span class="bd n" style="background:#eee;color:#111">Primi</span><span class="bd n">Secondi</span><span class="bd n">Dolci</span><span class="bd n">Vini</span></div>
@@ -301,7 +304,7 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
         <div style="position:absolute"></div>
         <div style="margin-top:6mm;display:grid;grid-template-columns:1fr 1fr;gap:2mm"><div style="border:1px solid #333;border-radius:2mm;padding:2.2mm;text-align:center">Chiama cameriere</div><div style="background:#c58a4a;color:#111;border-radius:2mm;padding:2.2mm;text-align:center;font-weight:600">Ordina · 2 piatti</div></div>
       </div></div>
-      <div class="app" style="width:78mm"><div class="cont"><div class="tit">Cucina</div><div class="sot">comande in arrivo</div>
+      <div class="app" style="width:78mm;flex:none"><div class="cont"><div class="tit">Cucina</div><div class="sot">comande in arrivo</div>
         <div class="box" style="margin-bottom:2mm"><b>Tavolo 12</b> <span class="bd warn">da 4 min</span><br>1× Carbonara<br>1× Tonnarelli cacio e pepe</div>
         <div class="box" style="margin-bottom:2mm"><b>Tavolo 5</b> <span class="bd n">in preparazione</span><br>2× Tagliata · 1 al sangue</div>
         <div class="box"><b>Tavolo 9</b> <span class="bd ok">pronto</span><br>3× Tiramisù</div></div></div>
@@ -373,7 +376,7 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
         <svg width="40" height="40" viewBox="0 0 64 64"><defs><linearGradient id="ko2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset=".55" stop-color="#e8a23a"/><stop offset="1" stop-color="#a8682a"/></linearGradient><radialGradient id="kl2"><stop offset="0" stop-color="#fff6d8"/><stop offset=".4" stop-color="#ffc24d"/><stop offset="1" stop-color="#ffc24d" stop-opacity="0"/></radialGradient></defs><path d="M44 8A26 26 0 1 0 44 56" fill="none" stroke="url(#ko2)" stroke-width="4.5" stroke-linecap="round"/><path d="M26 21v22M26 33l12-12M30 30l9 13" fill="none" stroke="url(#ko2)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="32" r="7" fill="url(#kl2)"/><circle cx="9" cy="32" r="2.2" fill="#fff3cf"/></svg><span class="w" style="font-size:15pt">KITCHEN OS</span></div>
     </div>
     <div class="carta" style="align-self:center;padding:10mm;background:rgba(23,21,19,.85)">
-      <div style="display:flex;align-items:center;gap:5mm"><img class="opic" src="opic-cerchio.png" style="width:34mm;margin:-5mm -4mm -5mm -6mm"><div><p class="occhiello" style="margin-bottom:2mm">Contatti</p><p style="font-family:Fraunces,serif;font-size:22pt;color:var(--crema);line-height:1.1">Opic.AI</p></div></div>
+      <div style="display:flex;align-items:center;gap:5mm"><img class="opic" src="opic-cerchio.png" style="width:24mm;flex:none"><div><p class="occhiello" style="margin-bottom:2mm">Contatti</p><p style="font-family:Fraunces,serif;font-size:22pt;color:var(--crema);line-height:1.1">Opic.AI</p></div></div>
       <p style="margin-top:1mm">Milano · operiamo in tutta Italia, di persona o in videochiamata</p>
       <div style="margin-top:7mm;display:grid;grid-template-columns:22mm 1fr;row-gap:2.8mm;font-size:10pt">
         <span style="color:var(--grigio2)">Telefono</span><span>+39 348 275 0780 <span style="color:var(--grigio2)">· anche WhatsApp</span></span>
