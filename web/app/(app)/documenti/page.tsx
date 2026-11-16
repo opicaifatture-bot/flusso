@@ -56,6 +56,7 @@ export default async function Documenti({ searchParams }: { searchParams: Promis
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-subtle" aria-hidden />
           <input name="q" defaultValue={q} placeholder="Numero, file o fornitore…" aria-label="Cerca documento" className="input w-60 pl-8" />
         </form>
+        <Link href="/documenti/fornitori" className="btn">Per fornitore</Link>
         {permessi.caricare && <Link href="/carica" className="btn btn-primary"><Upload className="size-3.5" />Carica</Link>}
       </Intestazione>
 
