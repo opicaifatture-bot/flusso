@@ -6,7 +6,7 @@ import { GeistMono } from "geist/font/mono";
 
 export const metadata: Metadata = {
   title: { default: "Kitchen OS", template: "%s · Kitchen OS" },
-  description: "Contabilità invisibile e controllo prezzi per la ristorazione di lusso",
+  description: "Il gestionale per la ristorazione",
 };
 export const viewport: Viewport = { themeColor: "#09090b", width: "device-width", initialScale: 1 };
 

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it"><head><meta charset="utf-8"><title>Kitchen OS — Brochure</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@400;500;600&family=Orbitron:wght@600;700&display=swap" rel="stylesheet">
 <style>
 @page { size: 297mm 210mm; margin: 0 }
 :root{--nero:#0e0d0c;--nero2:#171513;--nero3:#211e1b;--linea:#2e2a26;--crema:#f2ece3;--crema2:#e7dfd3;--grigio:#9b9389;--grigio2:#6f685f;--rame:#c58a4a;--rame2:#e0b07a;--ok:#5fae7c;--warn:#d9a441;--danger:#d0634f}
@@ -63,8 +63,8 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
 .nota{font-size:7pt;color:var(--grigio2);margin-top:4mm}
 .chiara .nota{color:#8b8378}
 .logo{display:flex;align-items:center;gap:3.5mm}
-.logo .w{font-family:Fraunces,serif;font-size:19pt;font-weight:400;letter-spacing:-.01em}
-.logo .w b{font-weight:600;color:var(--rame)}
+.logo .w{font-family:Orbitron,sans-serif;font-weight:700;font-size:17pt;letter-spacing:.08em;background:linear-gradient(180deg,#ffd98a,#e9a33c 55%,#b0702c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.opic{mix-blend-mode:lighten;display:block}
 .piani{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:7mm}
 .piano{border:1px solid #ddd3c4;border-radius:3mm;padding:7mm 6mm;background:#fbf8f3;position:relative}
 .piano.top{background:var(--nero);color:var(--crema);border-color:var(--nero)}
@@ -85,15 +85,14 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
     <g fill="none" stroke="#c58a4a" stroke-opacity=".16"><circle cx="860" cy="330" r="150"/><circle cx="860" cy="330" r="230"/><circle cx="860" cy="330" r="310"/><circle cx="860" cy="330" r="390"/></g>
   </svg>
   <div style="position:absolute;left:18mm;top:16mm" class="logo">
-    <svg width="34" height="34" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#c58a4a"/><path d="M20 44V20m0 12 14-12M24 30l12 14" stroke="#0e0d0c" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="45" cy="22" r="4" fill="#0e0d0c"/></svg>
-    <span class="w">Kitchen <b>OS</b></span>
+    <svg width="46" height="46" viewBox="0 0 64 64"><defs><linearGradient id="ko1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset=".55" stop-color="#e8a23a"/><stop offset="1" stop-color="#a8682a"/></linearGradient><radialGradient id="kl1"><stop offset="0" stop-color="#fff6d8"/><stop offset=".4" stop-color="#ffc24d"/><stop offset="1" stop-color="#ffc24d" stop-opacity="0"/></radialGradient></defs><path d="M44 8A26 26 0 1 0 44 56" fill="none" stroke="url(#ko1)" stroke-width="4.5" stroke-linecap="round"/><path d="M26 21v22M26 33l12-12M30 30l9 13" fill="none" stroke="url(#ko1)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="32" r="7" fill="url(#kl1)"/><circle cx="9" cy="32" r="2.2" fill="#fff3cf"/></svg><span class="w">KITCHEN OS</span>
   </div>
   <div style="position:absolute;left:18mm;bottom:34mm;width:170mm">
     <p class="occhiello">Il gestionale per la ristorazione</p>
     <h1>Tutta la tua cucina,<br><em>sotto controllo.</em></h1>
     <p style="font-size:12pt;margin-top:8mm;max-width:140mm;color:#c9bfb2">Fatture, costi, magazzino, temperature, HACCP e sala in un unico posto. Meno tempo in ufficio, più tempo dove conta.</p>
   </div>
-  <div class="piede"><span>Kitchen OS · by Opic.AI</span><span>opicai.it</span></div>
+  <div style="position:absolute;right:18mm;bottom:12mm;text-align:right"><p style="font-size:6.5pt;letter-spacing:.22em;color:#8a7d6d;margin-bottom:2mm">UN PRODOTTO</p><img class="opic" src="opic-orizzontale.png" style="height:17mm;margin-left:auto"></div>
 </section>
 
 <!-- 2 PROMESSA -->
@@ -371,12 +370,10 @@ table.t td{padding:1.3mm 1mm;border-bottom:1px solid #1b1b1d;font-size:6.3pt}
         <li><b>Team dedicato su richiesta</b> per sviluppare funzioni su misura per il tuo locale</li>
       </ul>
       <div class="logo" style="margin-top:auto">
-        <svg width="30" height="30" viewBox="0 0 64 64"><rect x="2" y="2" width="60" height="60" rx="16" fill="#c58a4a"/><path d="M20 44V20m0 12 14-12M24 30l12 14" stroke="#0e0d0c" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="45" cy="22" r="4" fill="#0e0d0c"/></svg>
-        <span class="w" style="font-size:16pt">Kitchen <b>OS</b></span></div>
+        <svg width="40" height="40" viewBox="0 0 64 64"><defs><linearGradient id="ko2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset=".55" stop-color="#e8a23a"/><stop offset="1" stop-color="#a8682a"/></linearGradient><radialGradient id="kl2"><stop offset="0" stop-color="#fff6d8"/><stop offset=".4" stop-color="#ffc24d"/><stop offset="1" stop-color="#ffc24d" stop-opacity="0"/></radialGradient></defs><path d="M44 8A26 26 0 1 0 44 56" fill="none" stroke="url(#ko2)" stroke-width="4.5" stroke-linecap="round"/><path d="M26 21v22M26 33l12-12M30 30l9 13" fill="none" stroke="url(#ko2)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="32" r="7" fill="url(#kl2)"/><circle cx="9" cy="32" r="2.2" fill="#fff3cf"/></svg><span class="w" style="font-size:15pt">KITCHEN OS</span></div>
     </div>
     <div class="carta" style="align-self:center;padding:10mm;background:rgba(23,21,19,.85)">
-      <p class="occhiello">Contatti</p>
-      <p style="font-family:Fraunces,serif;font-size:22pt;color:var(--crema);line-height:1.1">Opic.AI</p>
+      <div style="display:flex;align-items:center;gap:5mm"><img class="opic" src="opic-cerchio.png" style="width:34mm;margin:-5mm -4mm -5mm -6mm"><div><p class="occhiello" style="margin-bottom:2mm">Contatti</p><p style="font-family:Fraunces,serif;font-size:22pt;color:var(--crema);line-height:1.1">Opic.AI</p></div></div>
       <p style="margin-top:1mm">Milano · operiamo in tutta Italia, di persona o in videochiamata</p>
       <div style="margin-top:7mm;display:grid;grid-template-columns:22mm 1fr;row-gap:2.8mm;font-size:10pt">
         <span style="color:var(--grigio2)">Telefono</span><span>+39 348 275 0780 <span style="color:var(--grigio2)">· anche WhatsApp</span></span>

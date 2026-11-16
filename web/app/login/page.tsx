@@ -1,3 +1,4 @@
+import { Marchio } from "@/components/marchio";
 import type { Metadata } from "next";
 import { accedi } from "./actions";
 
@@ -10,9 +11,8 @@ export default async function Login({ searchParams }: { searchParams: Promise<{ 
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60 [background:radial-gradient(60%_50%_at_50%_0%,var(--ok-soft),transparent_70%)]" />
       <div className="relative w-full max-w-[360px] animate-in">
         <div className="mb-8 text-center">
-          <span className="mx-auto grid size-10 place-items-center rounded-xl bg-inverse text-base font-bold text-inverse-fg">P</span>
-          <h1 className="mt-5 text-xl font-semibold tracking-tight">Kitchen OS</h1>
-          <p className="mt-1 text-[13px] text-muted">Contabilità invisibile e controllo prezzi</p>
+          <h1><Marchio grande /></h1>
+          <p className="mt-3 text-[13px] text-muted">Il gestionale per la ristorazione</p>
         </div>
         <form action={accedi} className="card space-y-4 p-6 shadow-pop">
           <div>
