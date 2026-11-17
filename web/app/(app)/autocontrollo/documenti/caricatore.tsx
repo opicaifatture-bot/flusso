@@ -81,7 +81,7 @@ export function CaricaDocumento({ sede, documento, collegamenti }: {
         <button disabled={inCorso} className="btn btn-primary">{inCorso ? "Caricamento…" : documento ? "Carica nuova versione" : "Archivia"}</button>
         <p role="status" aria-live="polite" className={esito?.ok ? "text-xs text-ok" : "text-xs text-danger"}>{esito?.testo}</p>
       </div>
-      <p className="text-[11px] leading-relaxed text-subtle sm:col-span-2">Ogni file resta conservato: una revisione nuova si aggiunge come versione, le precedenti non si cancellano. L&apos;estrazione automatica dei contenuti (CCP, analisi, scadenze) arriverà con il prossimo blocco.</p>
+      <p className="text-[11px] leading-relaxed text-subtle sm:col-span-2">Ogni file resta conservato: una revisione nuova si aggiunge come versione, le precedenti non si cancellano. Manuale e piano analisi si leggono poi in automatico dalla scheda Piano, con «Leggi e proponi».</p>
     </form>
   );
 }
