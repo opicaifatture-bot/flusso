@@ -19,6 +19,8 @@ type Controllo = Record<string, unknown> & { id: string; categoria: string; tito
 
 const ESTRAIBILI = ["manuale_autocontrollo", "piano_analisi", "referto_analisi", "contratto_infestanti", "policy_igiene", "normativa"];
 
+const ORDINE_PROPOSTE = ["ccp", "ricevimento", "conservazione", "abbattimento", "prp_pulizia", "prp_infestanti", "analisi_acqua", "analisi_alimenti", "altro", "informazione"];
+
 export default async function Piano() {
   const c = await contestoAutocontrollo();
   const { supabase, attivo, puoPianificare, puoGestire } = c;
@@ -55,18 +57,32 @@ export default async function Piano() {
 
       {proposte?.length ? (
         <section className="mb-4" aria-labelledby="t-prop">
-          <h2 id="t-prop" className="eyebrow mb-2">Proposte da decidere ({proposte.length})</h2>
-          <ul className="space-y-2">{proposte.map((p) => (
-            <li key={p.id} className="card p-4">
-              <div className="flex flex-wrap items-center gap-2"><span className="text-[13px] font-medium">{p.titolo}</span><Badge>{CATEGORIE_CONTROLLO[p.categoria]}</Badge>
-                <span className="text-xs text-subtle">{titoloVersione.get(p.versione_id)}{p.pagina ? `, pagina ${p.pagina}` : ""}</span></div>
-              {p.citazione && <blockquote className="mt-2 border-l-2 border-line pl-3 text-xs italic text-muted">«{p.citazione}»</blockquote>}
-              <dl className="mt-2 grid gap-x-4 gap-y-1 text-xs sm:grid-cols-2">{Object.entries(p.dati).filter(([, v]) => v !== null && v !== "").map(([k, v]) => (
-                <div key={k} className="flex gap-2"><dt className="text-subtle">{ETICHETTE_CAMPI[k] ?? k}:</dt><dd>{k === "frequenza" ? FREQUENZE[String(v)] ?? String(v) : String(v)}</dd></div>
-              ))}</dl>
-              {puoPianificare ? <Proposta id={p.id} categoria={p.categoria} dati={p.dati} /> : <p className="mt-2 text-xs text-subtle">La decisione spetta al titolare o al consulente.</p>}
-            </li>
-          ))}</ul>
+          <h2 id="t-prop" className="eyebrow mb-1">Proposte da decidere ({proposte.length})</h2>
+          <p className="mb-3 text-xs text-muted">Raggruppate per argomento, in ordine di pagina. Le &laquo;informazioni&raquo; sono regole generali del manuale: basta prenderne visione.</p>
+          <div className="space-y-3">{ORDINE_PROPOSTE.map((cat) => {
+            const voci = proposte.filter((p) => (ORDINE_PROPOSTE.includes(p.categoria) ? p.categoria : "altro") === cat)
+              .sort((a, b) => (a.pagina ?? 999) - (b.pagina ?? 999));
+            if (!voci.length) return null;
+            return (
+              <details key={cat} open={cat !== "informazione"} className="card group">
+                <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-[13px] font-medium">
+                  {CATEGORIE_CONTROLLO[cat] ?? "Altro"}<Badge>{voci.length}</Badge>
+                  <span aria-hidden className="ml-auto text-subtle transition-transform duration-200 group-open:rotate-45">+</span>
+                </summary>
+                <ul className="divide-y divide-line border-t border-line">{voci.map((p) => (
+                  <li key={p.id} className="p-4">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1"><span className="text-[13px] font-medium">{p.titolo}</span>
+                      <span className="text-xs text-subtle">{p.pagina ? `pagina ${p.pagina}` : titoloVersione.get(p.versione_id)}</span></div>
+                    {p.citazione && <blockquote className="mt-2 border-l-2 border-line pl-3 text-xs italic text-muted">«{p.citazione}»</blockquote>}
+                    <dl className="mt-2 grid gap-x-4 gap-y-1 text-xs sm:grid-cols-2">{Object.entries(p.dati).filter(([, v]) => v !== null && v !== "").map(([k, v]) => (
+                      <div key={k} className="flex gap-2"><dt className="shrink-0 text-subtle">{ETICHETTE_CAMPI[k] ?? k}:</dt><dd className="min-w-0">{k === "frequenza" ? FREQUENZE[String(v)] ?? String(v) : String(v)}</dd></div>
+                    ))}</dl>
+                    {puoPianificare ? <Proposta id={p.id} categoria={p.categoria} dati={p.dati} /> : <p className="mt-2 text-xs text-subtle">La decisione spetta al titolare o al consulente.</p>}
+                  </li>
+                ))}</ul>
+              </details>
+            );
+          })}</div>
         </section>
       ) : null}
 
